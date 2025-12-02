@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /data/postgres
+    command:
+      - "-c"
+      - "shared_preload_libraries=pg_stat_statements"
+    volumes:
+      - pgdata:/data/postgres
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:
