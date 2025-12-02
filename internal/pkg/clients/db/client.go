@@ -74,8 +74,6 @@ func (p *client) Ping(ctx context.Context) error {
 }
 
 func (p *client) Close() error {
-	fmt.Println("11")
 	p.pool.Close()
-	fmt.Println("22")
 	return nil
 }

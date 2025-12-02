@@ -17,7 +17,7 @@ type Closer interface {
 
 type closer struct {
 	ctx      context.Context
-	logger   *logger_pkg.Logger
+	logger   logger_pkg.Logger
 	once     sync.Once
 	done     chan struct{}
 	funcs    []func() error
@@ -26,7 +26,7 @@ type closer struct {
 }
 
 // os.Interrupt, syscall.SIGINT, syscall.SIGTERM
-func New(ctx context.Context, logger *logger_pkg.Logger, sig ...os.Signal) Closer {
+func New(ctx context.Context, logger logger_pkg.Logger, sig ...os.Signal) Closer {
 	closer := &closer{
 		ctx:      ctx,
 		logger:   logger,

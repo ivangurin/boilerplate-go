@@ -15,22 +15,50 @@ const (
 	fieldSpanID  = "span_id"
 )
 
-type Logger struct {
+type Logger interface {
+	Debug(ctx context.Context, msg string)
+	Debugf(ctx context.Context, msg string, args ...any)
+	DebugKV(ctx context.Context, msg string, values ...string)
+
+	Info(ctx context.Context, msg string)
+	Infof(ctx context.Context, msg string, args ...any)
+	InfoKV(ctx context.Context, msg string, values ...string)
+
+	Warn(ctx context.Context, msg string)
+	Warnf(ctx context.Context, msg string, args ...any)
+	WarnKV(ctx context.Context, msg string, values ...string)
+
+	Error(ctx context.Context, msg string)
+	Errorf(ctx context.Context, msg string, args ...any)
+	ErrorKV(ctx context.Context, msg string, values ...string)
+
+	Panic(ctx context.Context, msg string)
+	Panicf(ctx context.Context, msg string, args ...any)
+	PanicKV(ctx context.Context, msg string, values ...string)
+
+	Fatal(ctx context.Context, msg string)
+	Fatalf(ctx context.Context, msg string, args ...any)
+	FatalKV(ctx context.Context, msg string, values ...string)
+
+	Close() error
+}
+
+type logger struct {
 	logger *zap.Logger
 }
 
-func New(opts ...ConfigOption) (*Logger, error) {
-	logger, err := NewConfig(opts...).Build()
+func New(opts ...ConfigOption) (Logger, error) {
+	l, err := NewConfig(opts...).Build()
 	if err != nil {
 		return nil, fmt.Errorf("create logger: %s", err.Error())
 	}
 
-	return &Logger{
-		logger: logger,
+	return &logger{
+		logger: l,
 	}, nil
 }
 
-func (l *Logger) Close() error {
+func (l *logger) Close() error {
 	err := l.logger.Sync()
 	if err != nil && !errors.Is(err, syscall.ENOTTY) {
 		return fmt.Errorf("logger sync: %s", err.Error())
@@ -38,79 +66,79 @@ func (l *Logger) Close() error {
 	return nil
 }
 
-func (l *Logger) Debug(ctx context.Context, msg string) {
+func (l *logger) Debug(ctx context.Context, msg string) {
 	l.logger.Debug(msg, l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) Debugf(ctx context.Context, msg string, args ...any) {
+func (l *logger) Debugf(ctx context.Context, msg string, args ...any) {
 	l.logger.Debug(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) DebugKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) DebugKV(ctx context.Context, msg string, values ...string) {
 	l.logger.Debug(msg, l.getFields(ctx, values)...)
 }
 
-func (l *Logger) Info(ctx context.Context, msg string) {
+func (l *logger) Info(ctx context.Context, msg string) {
 	l.logger.Info(msg, l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) Infof(ctx context.Context, msg string, args ...any) {
+func (l *logger) Infof(ctx context.Context, msg string, args ...any) {
 	l.logger.Info(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) InfoKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) InfoKV(ctx context.Context, msg string, values ...string) {
 	l.logger.Info(msg, l.getFields(ctx, values)...)
 }
 
-func (l *Logger) Warn(ctx context.Context, msg string) {
+func (l *logger) Warn(ctx context.Context, msg string) {
 	l.logger.Warn(msg, l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) Warnf(ctx context.Context, msg string, args ...any) {
+func (l *logger) Warnf(ctx context.Context, msg string, args ...any) {
 	l.logger.Warn(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) WarnKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) WarnKV(ctx context.Context, msg string, values ...string) {
 	l.logger.Warn(msg, l.getFields(ctx, values)...)
 }
 
-func (l *Logger) Error(ctx context.Context, msg string) {
+func (l *logger) Error(ctx context.Context, msg string) {
 	l.logger.Error(msg, l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) Errorf(ctx context.Context, msg string, args ...any) {
+func (l *logger) Errorf(ctx context.Context, msg string, args ...any) {
 	l.logger.Error(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) ErrorKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) ErrorKV(ctx context.Context, msg string, values ...string) {
 	l.logger.Error(msg, l.getFields(ctx, values)...)
 }
 
-func (l *Logger) Panic(ctx context.Context, msg string) {
+func (l *logger) Panic(ctx context.Context, msg string) {
 	l.logger.Panic(msg, l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) Panicf(ctx context.Context, msg string, args ...any) {
+func (l *logger) Panicf(ctx context.Context, msg string, args ...any) {
 	l.logger.Panic(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) PanicKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) PanicKV(ctx context.Context, msg string, values ...string) {
 	l.logger.Panic(msg, l.getFields(ctx, values)...)
 }
 
-func (l *Logger) Fatal(ctx context.Context, msg string) {
+func (l *logger) Fatal(ctx context.Context, msg string) {
 	l.logger.Fatal(msg, l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) Fatalf(ctx context.Context, msg string, args ...any) {
+func (l *logger) Fatalf(ctx context.Context, msg string, args ...any) {
 	l.logger.Fatal(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *Logger) FatalKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) FatalKV(ctx context.Context, msg string, values ...string) {
 	l.logger.Fatal(msg, l.getFields(ctx, values)...)
 }
 
-func (l *Logger) getFields(ctx context.Context, values []string) []zap.Field {
+func (l *logger) getFields(ctx context.Context, values []string) []zap.Field {
 	fields := make([]zap.Field, 0, len(values)/2+2)
 
 	for i := 0; i < len(values)-1; i += 2 {
@@ -130,7 +158,7 @@ func (l *Logger) getFields(ctx context.Context, values []string) []zap.Field {
 	return fields
 }
 
-func (l *Logger) getTraceID(ctx context.Context) string {
+func (l *logger) getTraceID(ctx context.Context) string {
 	spanCtx := trace.SpanContextFromContext(ctx)
 	if spanCtx.HasTraceID() {
 		return spanCtx.TraceID().String()
@@ -138,7 +166,7 @@ func (l *Logger) getTraceID(ctx context.Context) string {
 	return ""
 }
 
-func (l *Logger) getSpanID(ctx context.Context) string {
+func (l *logger) getSpanID(ctx context.Context) string {
 	spanCtx := trace.SpanContextFromContext(ctx)
 	if spanCtx.HasSpanID() {
 		return spanCtx.SpanID().String()

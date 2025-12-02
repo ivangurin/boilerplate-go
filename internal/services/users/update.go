@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (s *service) Update(ctx context.Context, req *UserUpdateRequest) (*User, error) {
+func (s *Service) Update(ctx context.Context, req *UserUpdateRequest) (*User, error) {
 	user, err := s.repo.Users().Get(ctx, req.ID)
 	if err != nil {
 		return nil, fmt.Errorf("get user: %s", err.Error())

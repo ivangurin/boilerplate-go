@@ -5,22 +5,22 @@ import (
 	"context"
 )
 
-type Service interface {
+type IService interface {
 	Create(ctx context.Context, req *UserCreateRequest) (*User, error)
-	// Get(ctx context.Context, id int) (*User, error)
-	// Update(ctx context.Context, id int, req *UserUpdateRequest) (*User, error)
-	// Delete(ctx context.Context, id int) error
-	// Search(ctx context.Context, req *UserSearchRequest) (*UserSearchResponse, error)
+	Get(ctx context.Context, id int) (*User, error)
+	Update(ctx context.Context, req *UserUpdateRequest) (*User, error)
+	Delete(ctx context.Context, id int) error
+	Search(ctx context.Context, req *UserSearchRequest) (*UserSearchResponse, error)
 }
 
-type service struct {
+type Service struct {
 	repo repository.Repo
 }
 
 func NewService(
 	repo repository.Repo,
-) Service {
-	return &service{
+) IService {
+	return &Service{
 		repo: repo,
 	}
 }

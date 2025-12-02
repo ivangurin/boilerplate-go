@@ -1,6 +1,8 @@
 package repository
 
-const TableUsers = "users"
+const (
+	TableUsers = "users"
+)
 
 const (
 	ColumnID        = "id"

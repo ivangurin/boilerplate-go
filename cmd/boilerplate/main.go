@@ -26,7 +26,7 @@ func main() {
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&config.DbDsn, "db-dsn", "", "postgres://postgres:postgres@localhost:5432/postgres", "Database DSN")
+	rootCmd.PersistentFlags().StringVarP(&config.DbDsn, "db-dsn", "", "postgres://postgres:postgres@localhost:5432/boilerplate", "Database DSN")
 
 	err := rootCmd.Execute()
 	if err != nil {

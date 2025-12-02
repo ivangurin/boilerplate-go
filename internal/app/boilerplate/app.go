@@ -10,6 +10,8 @@ import (
 	"boilerplate/internal/pkg/clients/db"
 	closer_pkg "boilerplate/internal/pkg/closer"
 	logger_pkg "boilerplate/internal/pkg/logger"
+	"boilerplate/internal/repository"
+	"boilerplate/internal/service_provider"
 	"boilerplate/migrations"
 )
 
@@ -52,6 +54,11 @@ func (a *App) Run() error {
 	}
 
 	closer.Add(dbClient.Close)
+
+	repo := repository.NewRepo(dbClient)
+
+	sp := service_provider.NewProvider(logger, repo)
+	_ = sp
 
 	logger.Info(ctx, "App is running...")
 

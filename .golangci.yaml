@@ -70,6 +70,8 @@ linters:
           disabled: true
         - name: flag-parameter
           disabled: true
+        - name: package-directory-mismatch
+          disabled: true
         - name: unhandled-error
           arguments:
             - "fmt\\..*"

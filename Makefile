@@ -1,11 +1,17 @@
+DB_NAME=boilerplate
+TEST_DB_NAME=boilerplate_test
+
 up:
 	docker-compose up -d
 
 down:
 	docker-compose down
 
-run:
-	go run ./cmd/main.go
+prepare-run:
+	docker exec boilerplate-go-postgres-1 createdb -Upostgres $(DB_NAME) || true;
+
+run: prepare-run
+	go run ./cmd/boilerplate/main.go
 
 lint: 
 	go tool golangci-lint run \
@@ -20,11 +26,23 @@ lint-full:
 	--config=.golangci.yaml \
 	--max-issues-per-linter=1000 \
 	--max-same-issues=1000 \
-	./...g
+	./...
 
-test:
+prepare-test:
+	@if [ -z "$$GITLAB_CI" ]; then \
+		echo "Preparing test database locally"; \
+		docker exec boilerplate-go-postgres-1 dropdb --if-exists -Upostgres $(TEST_DB_NAME); \
+		docker exec boilerplate-go-postgres-1 createdb -Upostgres $(TEST_DB_NAME); \
+	fi
+
+test: prepare-test
 	go test -v -count=1 ./... -coverprofile coverage.out.tmp 
 	@grep -vE "mock.go|pb.go" coverage.out.tmp > coverage.out
 	@rm -f coverage.out.tmp
 	@go tool cover -func coverage.out | grep total | awk '{print "Coverage percent: " $$3}'
 	@rm -f coverage.out
+
+gen-mock: 
+	go tool mockery
+
+generate: gen-mock

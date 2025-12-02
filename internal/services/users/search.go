@@ -6,14 +6,15 @@ import (
 	"fmt"
 )
 
-func (s *service) Search(ctx context.Context, req *UserSearchRequest) (*UserSearchResponse, error) {
+func (s *Service) Search(ctx context.Context, req *UserSearchRequest) (*UserSearchResponse, error) {
 	filter := &repository.UserFilter{
-		ID:     req.Filter.ID,
-		Email:  req.Filter.Email,
-		Name:   req.Filter.Name,
-		Limit:  req.Limit,
-		Offset: req.Offset,
-		Sort:   req.Sort,
+		ID:          req.Filter.ID,
+		Email:       req.Filter.Email,
+		Name:        req.Filter.Name,
+		WithDeleted: req.Filter.WithDeleted,
+		Limit:       req.Limit,
+		Offset:      req.Offset,
+		Sort:        req.Sort,
 	}
 
 	users, err := s.repo.Users().Search(ctx, filter)

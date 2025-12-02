@@ -7,7 +7,7 @@ import (
 	"boilerplate/internal/repository"
 )
 
-func (s *service) Create(ctx context.Context, req *UserCreateRequest) (*User, error) {
+func (s *Service) Create(ctx context.Context, req *UserCreateRequest) (*User, error) {
 	user := &repository.User{
 		Name:     req.Name,
 		Email:    req.Email,

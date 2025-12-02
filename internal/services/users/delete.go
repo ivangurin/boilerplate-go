@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (s *service) Delete(ctx context.Context, id int) error {
+func (s *Service) Delete(ctx context.Context, id int) error {
 	_, err := s.repo.Users().Get(ctx, id)
 	if err != nil {
 		return fmt.Errorf("get user: %s", err.Error())

@@ -23,15 +23,16 @@ func Migrate(dbClient db.Client) error {
 	}
 
 	sqlDB := sql.OpenDB(stdlib.GetPoolConnector(dbClient.GetPool()))
+	defer func() {
+		err = sqlDB.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
 
 	err = goose.Up(sqlDB, ".")
 	if err != nil {
 		return fmt.Errorf("goose up: %s", err.Error())
-	}
-
-	err = sqlDB.Close()
-	if err != nil {
-		return fmt.Errorf("close migrate connection: %s", err.Error())
 	}
 
 	return nil

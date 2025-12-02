@@ -17,8 +17,8 @@ type UserFilter struct {
 	Email       []string
 	IsAdmin     *bool
 	WithDeleted *bool
-	Limit       *uint64
-	Offset      *uint64
+	Limit       *int
+	Offset      *int
 	Sort        *string
 }
 
@@ -81,8 +81,7 @@ func (r *usersRepo) Get(ctx context.Context, id int) (*User, error) {
 	builder := sq.Select("*").
 		From(TableUsers).
 		Where(squirrel.Eq{
-			ColumnID:      id,
-			ColumnDeleted: false,
+			ColumnID: id,
 		})
 
 	query, args, err := builder.ToSql()
@@ -103,6 +102,7 @@ func (r *usersRepo) Update(ctx context.Context, user *User) error {
 	builder := sq.Update(TableUsers).
 		Set(ColumnName, user.Name).
 		Set(ColumnEmail, user.Email).
+		Set(ColumnPassword, user.Password).
 		Set(ColumnUpdatedAt, "now()").
 		Where(squirrel.Eq{
 			ColumnID: user.ID,
@@ -122,7 +122,9 @@ func (r *usersRepo) Update(ctx context.Context, user *User) error {
 }
 
 func (r *usersRepo) Delete(ctx context.Context, id int) error {
-	builder := squirrel.Delete(TableUsers).
+	builder := sq.Update(TableUsers).
+		Set(ColumnDeleted, true).
+		Set(ColumnDeletedAt, "now()").
 		Where(squirrel.Eq{
 			ColumnID: id,
 		})
@@ -168,32 +170,24 @@ func (r *usersRepo) Search(ctx context.Context, filter *UserFilter) (*Users, err
 		})
 	}
 
-	if filter.WithDeleted == nil {
+	if filter.WithDeleted == nil || *filter.WithDeleted == false {
 		builder = builder.Where(squirrel.Eq{
 			ColumnDeleted: false,
 		})
-	} else {
-		builder = builder.Where(squirrel.Eq{
-			ColumnDeleted: *filter.WithDeleted,
-		})
 	}
 
 	if filter.Limit != nil {
-		builder = builder.Limit(*filter.Limit)
-	}
-
-	if filter.Limit != nil {
-		builder = builder.Limit(*filter.Limit)
+		builder = builder.Limit(uint64(*filter.Limit))
 	}
 
 	if filter.Offset != nil {
-		builder = builder.Offset(*filter.Offset)
+		builder = builder.Offset(uint64(*filter.Offset))
 	}
 
 	if filter.Sort != nil {
 		builder = builder.OrderBy(*filter.Sort)
 	} else {
-		builder = builder.OrderBy(ColumnID + " DESC")
+		builder = builder.OrderBy(ColumnID + " ASC")
 	}
 
 	query, args, err := builder.ToSql()

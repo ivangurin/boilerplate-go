@@ -32,15 +32,16 @@ type UserUpdateRequest struct {
 
 type UserSearchRequest struct {
 	Filter UserSearchRequestFilter
-	Limit  *uint64
-	Offset *uint64
+	Limit  *int
+	Offset *int
 	Sort   *string
 }
 
 type UserSearchRequestFilter struct {
-	ID    []int
-	Name  *string
-	Email []string
+	ID          []int
+	Name        *string
+	Email       []string
+	WithDeleted *bool
 }
 
 type UserSearchResponse struct {
