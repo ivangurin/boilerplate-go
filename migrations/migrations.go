@@ -19,7 +19,7 @@ func Migrate(dbClient db.Client) error {
 
 	err := goose.SetDialect("postgres")
 	if err != nil {
-		return fmt.Errorf("set goose dialect: %s", err.Error())
+		return fmt.Errorf("set goose dialect: %w", err)
 	}
 
 	sqlDB := sql.OpenDB(stdlib.GetPoolConnector(dbClient.GetPool()))
@@ -32,7 +32,7 @@ func Migrate(dbClient db.Client) error {
 
 	err = goose.Up(sqlDB, ".")
 	if err != nil {
-		return fmt.Errorf("goose up: %s", err.Error())
+		return fmt.Errorf("goose up: %w", err)
 	}
 
 	return nil

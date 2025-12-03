@@ -1,11 +1,12 @@
 package users
 
 import (
-	"boilerplate/internal/repository"
 	"context"
+
+	"boilerplate/internal/repository"
 )
 
-type IService interface {
+type Service interface {
 	Create(ctx context.Context, req *UserCreateRequest) (*User, error)
 	Get(ctx context.Context, id int) (*User, error)
 	Update(ctx context.Context, req *UserUpdateRequest) (*User, error)
@@ -13,14 +14,14 @@ type IService interface {
 	Search(ctx context.Context, req *UserSearchRequest) (*UserSearchResponse, error)
 }
 
-type Service struct {
+type service struct {
 	repo repository.Repo
 }
 
 func NewService(
 	repo repository.Repo,
-) IService {
-	return &Service{
+) Service {
+	return &service{
 		repo: repo,
 	}
 }

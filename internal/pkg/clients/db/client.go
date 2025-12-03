@@ -26,11 +26,11 @@ type client struct {
 func New(ctx context.Context, dsn string) (Client, error) {
 	p, err := pgxpool.New(ctx, dsn)
 	if err != nil {
-		return nil, fmt.Errorf("create db pool: %s", err.Error())
+		return nil, fmt.Errorf("create db pool: %w", err)
 	}
 	err = p.Ping(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("ping db: %s", err.Error())
+		return nil, fmt.Errorf("ping db: %w", err)
 	}
 
 	return &client{

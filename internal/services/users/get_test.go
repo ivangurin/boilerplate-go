@@ -36,3 +36,13 @@ func TestGetUser(t *testing.T) {
 	require.NotEmpty(t, createdUser.CreatedAt)
 	require.NotEmpty(t, createdUser.UpdatedAt)
 }
+
+func TestGetUserNotFound(t *testing.T) {
+	t.Parallel()
+
+	sp, cleanup := suite_provider.NewProvider()
+	defer cleanup()
+
+	_, err := sp.GetUserService().Get(sp.Context(), -1)
+	require.Error(t, err)
+}

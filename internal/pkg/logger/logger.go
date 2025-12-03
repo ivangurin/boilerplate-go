@@ -50,7 +50,7 @@ type logger struct {
 func New(opts ...ConfigOption) (Logger, error) {
 	l, err := NewConfig(opts...).Build()
 	if err != nil {
-		return nil, fmt.Errorf("create logger: %s", err.Error())
+		return nil, fmt.Errorf("create logger: %w", err)
 	}
 
 	return &logger{
@@ -61,7 +61,7 @@ func New(opts ...ConfigOption) (Logger, error) {
 func (l *logger) Close() error {
 	err := l.logger.Sync()
 	if err != nil && !errors.Is(err, syscall.ENOTTY) {
-		return fmt.Errorf("logger sync: %s", err.Error())
+		return fmt.Errorf("logger sync: %w", err)
 	}
 	return nil
 }

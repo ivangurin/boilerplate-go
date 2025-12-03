@@ -11,17 +11,6 @@ import (
 	"boilerplate/internal/pkg/easyscan"
 )
 
-type UserFilter struct {
-	ID          []int
-	Name        *string
-	Email       []string
-	IsAdmin     *bool
-	WithDeleted *bool
-	Limit       *int
-	Offset      *int
-	Sort        *string
-}
-
 type User struct {
 	ID        int        `db:"id"`
 	Name      string     `db:"name"`
@@ -32,6 +21,17 @@ type User struct {
 	CreatedAt time.Time  `db:"created_at"`
 	UpdatedAt time.Time  `db:"updated_at"`
 	DeletedAt *time.Time `db:"deleted_at"`
+}
+
+type UserFilter struct {
+	ID          []int
+	Name        *string
+	Email       []string
+	IsAdmin     *bool
+	WithDeleted *bool
+	Limit       *int
+	Offset      *int
+	Sort        *string
 }
 
 type Users struct {
@@ -65,13 +65,13 @@ func (r *usersRepo) Create(ctx context.Context, user *User) (int, error) {
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return 0, fmt.Errorf("to sql, %s", err.Error())
+		return 0, fmt.Errorf("to sql: %w", err)
 	}
 
 	var id int
 	err = r.dbClient.QueryRow(ctx, query, args...).Scan(&id)
 	if err != nil {
-		return 0, fmt.Errorf("execute query create user: %s", err.Error())
+		return 0, fmt.Errorf("execute query create user: %w", err)
 	}
 
 	return id, nil
@@ -86,13 +86,13 @@ func (r *usersRepo) Get(ctx context.Context, id int) (*User, error) {
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("to sql, %s", err.Error())
+		return nil, fmt.Errorf("to sql: %w", err)
 	}
 
 	user := &User{}
 	err = easyscan.Get(ctx, r.dbClient, user, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("execute query get user: %s", err.Error())
+		return nil, fmt.Errorf("execute query get user: %w", err)
 	}
 
 	return user, nil
@@ -110,12 +110,12 @@ func (r *usersRepo) Update(ctx context.Context, user *User) error {
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return fmt.Errorf("to sql, %s", err.Error())
+		return fmt.Errorf("to sql: %w", err)
 	}
 
 	_, err = r.dbClient.Exec(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf("execute query update user: %s", err.Error())
+		return fmt.Errorf("execute query update user: %w", err)
 	}
 
 	return nil
@@ -131,12 +131,12 @@ func (r *usersRepo) Delete(ctx context.Context, id int) error {
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return fmt.Errorf("to sql, %s", err.Error())
+		return fmt.Errorf("to sql: %w", err)
 	}
 
 	_, err = r.dbClient.Exec(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf("execute query delete user: %s", err.Error())
+		return fmt.Errorf("execute query delete user: %w", err)
 	}
 
 	return nil
@@ -192,13 +192,13 @@ func (r *usersRepo) Search(ctx context.Context, filter *UserFilter) (*Users, err
 
 	query, args, err := builder.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("to sql, %s", err.Error())
+		return nil, fmt.Errorf("to sql: %w", err)
 	}
 
 	users := &Users{}
 	err = easyscan.Select(ctx, r.dbClient, &users.Result, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("execute query search users: %s", err.Error())
+		return nil, fmt.Errorf("execute query search users: %w", err)
 	}
 
 	return users, nil

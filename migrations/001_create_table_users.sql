@@ -13,7 +13,7 @@ create table users (
 );
 
 insert into users (name, email, password, is_admin, created_at, updated_at) values
-    ('Admin', 'admin@example.com', 'password', true, now(), now());
+    ('Admin', 'admin@example.com', '$2a$14$ZMeqfBsFJGv63xq5AKRwheUa.Aidv6/PWeXgyZemuEv68VwD24kBW', true, now(), now());
 -- +goose StatementEnd
 
 -- +goose Down

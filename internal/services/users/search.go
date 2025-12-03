@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func (s *Service) Search(ctx context.Context, req *UserSearchRequest) (*UserSearchResponse, error) {
+func (s *service) Search(ctx context.Context, req *UserSearchRequest) (*UserSearchResponse, error) {
 	filter := &repository.UserFilter{
 		ID:          req.Filter.ID,
 		Email:       req.Filter.Email,
@@ -19,7 +19,7 @@ func (s *Service) Search(ctx context.Context, req *UserSearchRequest) (*UserSear
 
 	users, err := s.repo.Users().Search(ctx, filter)
 	if err != nil {
-		return nil, fmt.Errorf("get user: %s", err.Error())
+		return nil, fmt.Errorf("get user: %w", err)
 	}
 
 	resp := &UserSearchResponse{

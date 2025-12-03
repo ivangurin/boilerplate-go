@@ -17,6 +17,7 @@ func NewConfig(opts ...ConfigOption) zap.Config {
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
 	config.DisableCaller = true
+	config.DisableStacktrace = true
 
 	for _, opt := range opts {
 		opt(&config)

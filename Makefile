@@ -45,4 +45,8 @@ test: prepare-test
 gen-mock: 
 	go tool mockery
 
-generate: gen-mock
+gen-swag:
+	go tool swag fmt	
+	go tool swag init --parseDependency --parseInternal -g handlers.go -d internal/api/handlers -o internal/api/swagger
+
+generate: gen-mock gen-swag

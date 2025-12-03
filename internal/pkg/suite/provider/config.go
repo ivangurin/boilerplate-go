@@ -4,6 +4,19 @@ import "boilerplate/internal/model"
 
 func GetConfig() *model.Config {
 	return &model.Config{
-		DbDsn: "postgres://postgres:postgres@localhost:5432/boilerplate_test",
+		DB: model.ConfigDB{
+			Host:     "localhost",
+			Port:     "5432",
+			User:     "postgres",
+			Password: "postgres",
+			Name:     "boilerplate_test",
+			SslMode:  false,
+		},
+		API: model.ConfigAPI{
+			Port:             "8080",
+			AccessPrivateKey: "dd4dcf2eae3c3a6f097d69f49ce584852d66ac85505f5d264e1b6fb8f90d9019",
+			AccessTokenTTL:   10,
+			RefreshTokenTTL:  60,
+		},
 	}
 }

@@ -24,24 +24,24 @@ type UserCreateRequest struct {
 }
 
 type UserUpdateRequest struct {
-	ID       int
-	Name     *string
-	Email    *string
-	Password *string
+	ID       int     `uri:"userid"`
+	Name     *string `json:"name"`
+	Email    *string `json:"email"`
+	Password *string `json:"password"`
 }
 
 type UserSearchRequest struct {
 	Filter UserSearchRequestFilter
-	Limit  *int
-	Offset *int
-	Sort   *string
+	Limit  *int    `form:"limit"`
+	Offset *int    `form:"offset"`
+	Sort   *string `form:"sort"`
 }
 
 type UserSearchRequestFilter struct {
-	ID          []int
-	Name        *string
-	Email       []string
-	WithDeleted *bool
+	ID          []int    `form:"id"`
+	Name        *string  `form:"name"`
+	Email       []string `form:"email"`
+	WithDeleted *bool    `form:"with_deleted"`
 }
 
 type UserSearchResponse struct {
