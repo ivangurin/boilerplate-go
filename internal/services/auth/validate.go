@@ -1,129 +1,91 @@
 package auth
 
 import (
-	"errors"
-	"net/http"
+	"context"
+	"fmt"
 
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
-
-	"boilerplate/internal/model"
-	gin_pkg "boilerplate/internal/pkg/gin"
+	errors_pkg "boilerplate/internal/pkg/errors"
 	jwt_pkg "boilerplate/internal/pkg/jwt"
-	"boilerplate/internal/pkg/metadata"
 )
 
-var errUnauthorized = errors.New("требуется авторизация")
+var errUnauthorized = errors_pkg.NewUnauthorizedError("требуется аутентификация")
 
-func (s *service) Validate() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		accessToken, exists := gin_pkg.GetAccessToken(ctx)
-		if exists {
-			claims, err := validateToken(accessToken, s.config)
-			if err != nil {
-				gin_pkg.RenderResponse(ctx, http.StatusUnauthorized, errUnauthorized)
-				ctx.Abort()
-				return
-			}
+func (s *service) Validate(ctx context.Context, req *AuthValidateRequest) (*AuthValidateResponse, error) {
+	resp := &AuthValidateResponse{}
 
-			userID, exists := GetUserID(claims)
-			if !exists {
-				gin_pkg.RenderResponse(ctx, http.StatusUnauthorized, errUnauthorized)
-				ctx.Abort()
-				return
-			}
-
-			ctx.Set(metadata.KeyUserID, userID)
-
-			userName, exists := GetUserName(claims)
-			if exists {
-				ctx.Set(metadata.KeyUserName, userName)
-			}
-
-			return
-		}
-
-		refreshToken, exists := gin_pkg.GetRefreshToken(ctx)
-		if !exists {
-			gin_pkg.RenderResponse(ctx, http.StatusUnauthorized, errUnauthorized)
-			ctx.Abort()
-			return
-		}
-
-		claims, err := validateToken(refreshToken, s.config)
+	if req.AccessToken != nil {
+		claims, err := jwt_pkg.ValidateToken(*req.AccessToken, s.config)
 		if err != nil {
-			gin_pkg.RenderResponse(ctx, http.StatusUnauthorized, errUnauthorized)
-			ctx.Abort()
-			return
+			return nil, errUnauthorized
 		}
 
-		userID, exists := GetUserID(claims)
+		userID, exists := jwt_pkg.GetUserID(claims)
 		if !exists {
-			gin_pkg.RenderResponse(ctx, http.StatusUnauthorized, errUnauthorized)
-			ctx.Abort()
-			return
+			return nil, errUnauthorized
+		}
+
+		resp.UserID = &userID
+
+		userName, exists := jwt_pkg.GetUserName(claims)
+		if exists {
+			resp.UserName = &userName
 		}
 
 		user, err := s.usersService.Get(ctx, userID)
 		if err != nil {
-			gin_pkg.RenderResponse(ctx, http.StatusUnauthorized, errUnauthorized)
-			ctx.Abort()
-			return
+			return nil, errUnauthorized
 		}
 
 		if user.Deleted {
-			gin_pkg.RenderResponse(ctx, http.StatusUnauthorized, errUnauthorized)
-			ctx.Abort()
-			return
+			return nil, errUnauthorized
 		}
 
-		ctx.Set(metadata.KeyUserID, user.ID)
-		ctx.Set(metadata.KeyUserName, user.Name)
-
-		newAccessToken, err := jwt_pkg.GenerateAccessToken(user.ID, user.Name, s.config)
-		if err != nil {
-			gin_pkg.RenderResponse(ctx, http.StatusInternalServerError, err)
-			ctx.Abort()
-			return
-		}
-
-		newRefreshToken, err := jwt_pkg.GenerateRefreshToken(user.ID, user.Name, s.config)
-		if err != nil {
-			gin_pkg.RenderResponse(ctx, http.StatusInternalServerError, err)
-			ctx.Abort()
-			return
-		}
-
-		gin_pkg.SetAccessToken(ctx, newAccessToken, s.config.AccessTokenTTL)
-		gin_pkg.SetRefreshToken(ctx, newRefreshToken, s.config.RefreshTokenTTL)
+		return resp, nil
 	}
-}
 
-func validateToken(token string, config *model.ConfigAPI) (jwt.MapClaims, error) {
-	parsedToken, claims, err := jwt_pkg.ParseToken(token, config)
+	if req.RefreshToken == nil {
+		return nil, errUnauthorized
+	}
+
+	claims, err := jwt_pkg.ValidateToken(*req.RefreshToken, s.config)
 	if err != nil {
-		return nil, errors.New("недействительный токен")
+		return nil, errUnauthorized
 	}
 
-	if !parsedToken.Valid {
-		return nil, errors.New("недействительный токен")
+	userID, exists := jwt_pkg.GetUserID(claims)
+	if !exists {
+		return nil, errUnauthorized
 	}
 
-	return claims, nil
-}
+	resp.UserID = &userID
 
-func GetUserID(claims jwt.MapClaims) (int, bool) {
-	userID, ok := claims[jwt_pkg.KeyUserID].(float64)
-	if !ok {
-		return 0, false
+	userName, exists := jwt_pkg.GetUserName(claims)
+	if exists {
+		resp.UserName = &userName
 	}
-	return int(userID), true
-}
 
-func GetUserName(claims jwt.MapClaims) (string, bool) {
-	userName, ok := claims[jwt_pkg.KeyUserName].(string)
-	if !ok {
-		return "", false
+	user, err := s.usersService.Get(ctx, userID)
+	if err != nil {
+		return nil, errUnauthorized
 	}
-	return userName, true
+
+	if user.Deleted {
+		return nil, errUnauthorized
+	}
+
+	newAccessToken, err := jwt_pkg.GenerateAccessToken(user.ID, user.Name, s.config)
+	if err != nil {
+		return nil, fmt.Errorf("create access token: %w", err)
+	}
+
+	resp.AccessToken = &newAccessToken
+
+	newRefreshToken, err := jwt_pkg.GenerateRefreshToken(user.ID, user.Name, s.config)
+	if err != nil {
+		return nil, fmt.Errorf("create refresh token: %w", err)
+	}
+
+	resp.RefreshToken = &newRefreshToken
+
+	return resp, nil
 }

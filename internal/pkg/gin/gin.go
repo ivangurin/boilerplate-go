@@ -3,6 +3,7 @@ package gin
 import (
 	"boilerplate/internal/model"
 	"boilerplate/internal/pkg/errors"
+	"boilerplate/internal/pkg/metadata"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -80,4 +81,12 @@ func GetRefreshToken(ctx *gin.Context) (string, bool) {
 		return "", false
 	}
 	return value, true
+}
+
+func SetUserID(ctx *gin.Context, userID int) {
+	ctx.Set(metadata.KeyUserID, userID)
+}
+
+func SetUserName(ctx *gin.Context, userName string) {
+	ctx.Set(metadata.KeyUserName, userName)
 }

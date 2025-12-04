@@ -8,8 +8,8 @@ import (
 
 func (s *service) Search(ctx context.Context, req *UserSearchRequest) (*UserSearchResponse, error) {
 	filter := &repository.UserFilter{
-		ID:          req.Filter.ID,
-		Email:       req.Filter.Email,
+		IDs:         req.Filter.ID,
+		Emails:      req.Filter.Email,
 		Name:        req.Filter.Name,
 		WithDeleted: req.Filter.WithDeleted,
 		Limit:       req.Limit,

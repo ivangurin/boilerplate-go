@@ -10,7 +10,7 @@ import (
 
 type Provider struct {
 	ctx      context.Context
-	cfg      *model.Config
+	config   *model.Config
 	logger   logger_pkg.Logger
 	repo     repository.Repo
 	clients  clients // nolint: unused
@@ -27,7 +27,7 @@ func NewProvider() (*Provider, func()) {
 
 	sp := &Provider{
 		ctx:    context.Background(),
-		cfg:    GetConfig(),
+		config: InitConfig(),
 		logger: logger,
 	}
 

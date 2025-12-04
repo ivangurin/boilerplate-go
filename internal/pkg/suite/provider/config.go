@@ -2,7 +2,14 @@ package suite_provider
 
 import "boilerplate/internal/model"
 
-func GetConfig() *model.Config {
+func (sp *Provider) GetConfig() *model.Config {
+	if sp.config == nil {
+		sp.config = InitConfig()
+	}
+	return sp.config
+}
+
+func InitConfig() *model.Config {
 	return &model.Config{
 		DB: model.ConfigDB{
 			Host:     "localhost",

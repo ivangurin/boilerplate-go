@@ -3,8 +3,6 @@ package auth
 import (
 	"context"
 
-	"github.com/gin-gonic/gin"
-
 	"boilerplate/internal/model"
 	"boilerplate/internal/services/users"
 )
@@ -14,7 +12,7 @@ type Service interface {
 	Login(ctx context.Context, req *AuthLoginRequest) (*AuthLoginResponse, error)
 	Refresh(ctx context.Context, req *AuthRefreshRequest) (*AuthRefreshResponse, error)
 	Me(ctx context.Context) (*users.User, error)
-	Validate() gin.HandlerFunc
+	Validate(ctx context.Context, req *AuthValidateRequest) (*AuthValidateResponse, error)
 }
 
 type service struct {

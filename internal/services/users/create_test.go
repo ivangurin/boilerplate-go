@@ -3,6 +3,7 @@ package users_test
 import (
 	"testing"
 
+	"github.com/brianvoe/gofakeit/v7"
 	"github.com/stretchr/testify/require"
 
 	"boilerplate/internal/pkg/pwd"
@@ -17,7 +18,7 @@ func TestCreateUser(t *testing.T) {
 	sp, cleanup := suite_provider.NewProvider()
 	defer cleanup()
 
-	user := suite_factory.NewUserFactory().Build()
+	user := suite_factory.NewUserFactory().WithPassword(gofakeit.Word()).Build()
 
 	createdUser, err := sp.GetUserService().Create(sp.Context(), &users.UserCreateRequest{
 		Name:     user.Name,

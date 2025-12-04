@@ -8,13 +8,15 @@ import (
 	errors_pkg "boilerplate/internal/pkg/errors"
 	"boilerplate/internal/pkg/jwt"
 	"boilerplate/internal/pkg/pwd"
+	"boilerplate/internal/pkg/utils"
 	users_service "boilerplate/internal/services/users"
 )
 
 func (s *service) Login(ctx context.Context, req *AuthLoginRequest) (*AuthLoginResponse, error) {
 	users, err := s.usersService.Search(ctx, &users_service.UserSearchRequest{
 		Filter: users_service.UserSearchRequestFilter{
-			Email: []string{req.Email},
+			Email:       []string{req.Email},
+			WithDeleted: utils.Ptr(true),
 		},
 	})
 	if err != nil {

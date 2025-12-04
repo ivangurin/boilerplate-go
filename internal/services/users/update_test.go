@@ -3,6 +3,7 @@ package users_test
 import (
 	"testing"
 
+	"github.com/brianvoe/gofakeit/v7"
 	"github.com/stretchr/testify/require"
 
 	"boilerplate/internal/pkg/pwd"
@@ -18,17 +19,13 @@ func TestUpdateUser(t *testing.T) {
 	defer cleanup()
 
 	user := suite_factory.NewUserFactory().Build()
-
-	createdUser, err := sp.GetUserService().Create(sp.Context(), &users.UserCreateRequest{
-		Name:  user.Name,
-		Email: user.Email,
-	})
+	userID, err := sp.GetRepo().Users().Create(sp.Context(), user)
 	require.NoError(t, err)
 
-	user = suite_factory.NewUserFactory().Build()
+	user = suite_factory.NewUserFactory().WithPassword(gofakeit.Word()).Build()
 
 	updatedUser, err := sp.GetUserService().Update(sp.Context(), &users.UserUpdateRequest{
-		ID:       createdUser.ID,
+		ID:       userID,
 		Name:     &user.Name,
 		Email:    &user.Email,
 		Password: &user.Password,

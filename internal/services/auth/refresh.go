@@ -28,12 +28,12 @@ func (s *service) Refresh(ctx context.Context, req *AuthRefreshRequest) (*AuthRe
 		return nil, errors_pkg.NewUnauthorizedError("недействительный токен")
 	}
 
-	userID, ok := claims["user_id"].(float64)
-	if !ok {
+	userID, exists := jwt_pkg.GetUserID(claims)
+	if !exists {
 		return nil, errors_pkg.NewUnauthorizedError("не указан код пользователя")
 	}
 
-	user, err := s.usersService.Get(ctx, int(userID))
+	user, err := s.usersService.Get(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

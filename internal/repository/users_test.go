@@ -106,21 +106,21 @@ func TestUserSearch(t *testing.T) {
 		{
 			Name: "wrong email",
 			Filter: &repository.UserFilter{
-				Email: []string{"wrong@example.com"},
+				Emails: []string{"wrong@example.com"},
 			},
 			Expected: 0,
 		},
 		{
 			Name: "correct 1 email",
 			Filter: &repository.UserFilter{
-				Email: []string{users[0].Email},
+				Emails: []string{users[0].Email},
 			},
 			Expected: 1,
 		},
 		{
 			Name: "correct 2 emails",
 			Filter: &repository.UserFilter{
-				Email: []string{users[0].Email, users[1].Email},
+				Emails: []string{users[0].Email, users[1].Email},
 			},
 			Expected: 2,
 		},

@@ -24,9 +24,9 @@ type User struct {
 }
 
 type UserFilter struct {
-	ID          []int
+	IDs         []int
 	Name        *string
-	Email       []string
+	Emails      []string
 	IsAdmin     *bool
 	WithDeleted *bool
 	Limit       *int
@@ -146,9 +146,9 @@ func (r *usersRepo) Search(ctx context.Context, filter *UserFilter) (*Users, err
 	builder := sq.Select("*").
 		From(TableUsers)
 
-	if filter.ID != nil {
+	if filter.IDs != nil {
 		builder = builder.Where(squirrel.Eq{
-			ColumnID: filter.ID,
+			ColumnID: filter.IDs,
 		})
 	}
 
@@ -158,9 +158,9 @@ func (r *usersRepo) Search(ctx context.Context, filter *UserFilter) (*Users, err
 		})
 	}
 
-	if filter.Email != nil {
+	if filter.Emails != nil {
 		builder = builder.Where(squirrel.Eq{
-			ColumnEmail: filter.Email,
+			ColumnEmail: filter.Emails,
 		})
 	}
 

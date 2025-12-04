@@ -42,9 +42,8 @@ func (f *UserFactory) Builds(times int) []*repository.User {
 
 func (f *UserFactory) generate() *repository.User {
 	user := &repository.User{
-		Name:     gofakeit.FirstName() + " " + gofakeit.LastName(),
-		Email:    gofakeit.Email(),
-		Password: gofakeit.Word(),
+		Name:  gofakeit.FirstName() + " " + gofakeit.LastName(),
+		Email: gofakeit.Email(),
 	}
 
 	for _, setter := range f.setters {
