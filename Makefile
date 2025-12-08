@@ -1,3 +1,4 @@
+VERSION ?= dev
 DB_NAME=boilerplate
 TEST_DB_NAME=boilerplate_test
 
@@ -12,6 +13,10 @@ prepare-run:
 
 run: prepare-run
 	go run ./cmd/boilerplate/main.go
+
+.PHONY: build
+build:
+	go build -ldflags "-X boilerplate/internal/pkg/version.gitVersion=${VERSION} -X 'boilerplate/internal/pkg/version.buildDate=$(shell date -u '+%Y-%m-%d %H:%M:%S')' -s -w" -trimpath -o bin/boilerplate ./cmd/boilerplate/main.go
 
 lint: 
 	go tool golangci-lint run \

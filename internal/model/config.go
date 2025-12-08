@@ -3,25 +3,25 @@ package model
 import "fmt"
 
 type Config struct {
-	LogLevel string    `yaml:"log_level" json:"log_level"`
-	DB       ConfigDB  `yaml:"db" json:"db"`
-	API      ConfigAPI `yaml:"api" json:"api"`
+	LogLevel string    `yaml:"log_level" json:"log_level" mapstructure:"log-level" validate:"required"`
+	DB       ConfigDB  `yaml:"db" json:"db" mapstructure:"db"`
+	API      ConfigAPI `yaml:"api" json:"api" mapstructure:"api"`
 }
 
 type ConfigDB struct {
-	Host     string `yaml:"host" json:"host"`
-	Port     string `yaml:"port" json:"port"`
-	User     string `yaml:"user" json:"user"`
-	Password string `yaml:"password" json:"password"`
-	Name     string `yaml:"name" json:"name"`
-	SslMode  bool   `yaml:"ssl-mode" json:"ssl-mode"`
+	Host     string `yaml:"host" json:"host" mapstructure:"host" validate:"required"`
+	Port     string `yaml:"port" json:"port" mapstructure:"port" validate:"required"`
+	User     string `yaml:"user" json:"user" mapstructure:"user" validate:"required"`
+	Password string `yaml:"password" json:"password" mapstructure:"password" validate:"required"`
+	Name     string `yaml:"name" json:"name" mapstructure:"name" validate:"required"`
+	SslMode  bool   `yaml:"ssl-mode" json:"ssl-mode" mapstructure:"ssl-mode"`
 }
 
 type ConfigAPI struct {
-	Port             string `yaml:"port" json:"port"`
-	AccessPrivateKey string `yaml:"access-private-key" json:"access-private-key"`
-	AccessTokenTTL   int    `yaml:"access-token-ttl" json:"token-ttl"`
-	RefreshTokenTTL  int    `yaml:"refresh-token-ttl" json:"refresh-token-ttl"`
+	Port             string `yaml:"port" json:"port" mapstructure:"port" validate:"required"`
+	AccessPrivateKey string `yaml:"access-private-key" json:"access-private-key" mapstructure:"access-private-key" validate:"required"`
+	AccessTokenTTL   int    `yaml:"access-token-ttl" json:"token-ttl" mapstructure:"access-token-ttl" validate:"required"`
+	RefreshTokenTTL  int    `yaml:"refresh-token-ttl" json:"refresh-token-ttl" mapstructure:"refresh-token-ttl" validate:"required"`
 }
 
 func (c ConfigDB) GetDSN() string {
