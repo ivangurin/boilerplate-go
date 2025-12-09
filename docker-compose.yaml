@@ -14,4 +14,9 @@ services:
       - "5432:5432"
 
 volumes:
-  pgdata:
+  pg-data:
+
+networks:
+  boilerplate-network:
+    name: boilerplate-network
+    driver: bridge

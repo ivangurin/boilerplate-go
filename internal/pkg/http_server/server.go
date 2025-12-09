@@ -19,10 +19,10 @@ type server struct {
 	server *http.Server
 }
 
-func NewServer(port string, handler http.Handler) Server {
+func NewServer(host, port string, handler http.Handler) Server {
 	server := &server{
 		server: &http.Server{
-			Addr:              fmt.Sprintf("127.0.0.1:%s", port),
+			Addr:              fmt.Sprintf("%s:%s", host, port),
 			ReadHeaderTimeout: Timeout,
 			ReadTimeout:       Timeout,
 			Handler:           handler,

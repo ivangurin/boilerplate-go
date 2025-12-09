@@ -1,0 +1,21 @@
+FROM golang:1.25 AS builder
+
+ARG VERSION
+ARG CI_COMMIT_SHA
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=0 go build -ldflags "-X boilerplate/internal/pkg/version.gitVersion=${VERSION} -X boilerplate/internal/pkg/version.gitCommit=${CI_COMMIT_SHA} -X 'boilerplate/internal/pkg/version.buildDate=$(date -u '+%Y-%m-%d %H:%M:%S')' -s -w" -trimpath -o ./bin/boilerplate ./cmd/boilerplate/main.go
+
+FROM alpine:3.23
+
+WORKDIR /app
+
+COPY --from=builder /app/bin/boilerplate ./
+
+CMD ["./boilerplate"]

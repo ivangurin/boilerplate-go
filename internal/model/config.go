@@ -18,6 +18,7 @@ type ConfigDB struct {
 }
 
 type ConfigAPI struct {
+	Host             string `yaml:"host" json:"host" mapstructure:"host" validate:"required"`
 	Port             string `yaml:"port" json:"port" mapstructure:"port" validate:"required"`
 	AccessPrivateKey string `yaml:"access-private-key" json:"access-private-key" mapstructure:"access-private-key" validate:"required"`
 	AccessTokenTTL   int    `yaml:"access-token-ttl" json:"token-ttl" mapstructure:"access-token-ttl" validate:"required"`

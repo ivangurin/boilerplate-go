@@ -67,7 +67,7 @@ func (a *App) Run() error {
 	sp := service_provider.NewProvider(a.config, logger, repo)
 
 	// HTTP Server
-	httpServer := http_server.NewServer(a.config.API.Port, handlers.NewHandler(logger, sp))
+	httpServer := http_server.NewServer(a.config.API.Host, a.config.API.Port, handlers.NewHandler(logger, sp))
 
 	go func() {
 		logger.Infof(ctx, "http server started on port %s", a.config.API.Port)

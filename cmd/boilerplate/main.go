@@ -119,6 +119,9 @@ func defineFlags(cmd *cobra.Command, config *model.Config) error {
 	}
 
 	// API
+	if err = bindStringVar(cmd, &config.API.Host, "api.host", "127.0.0.1", "API Host"); err != nil {
+		return fmt.Errorf("bind api.host: %w", err)
+	}
 	if err = bindStringVar(cmd, &config.API.Port, "api.port", "8080", "API Port"); err != nil {
 		return fmt.Errorf("bind api.port: %w", err)
 	}
