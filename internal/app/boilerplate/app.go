@@ -3,18 +3,28 @@ package boilerplate
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/http"
 	"os"
 	"syscall"
 
-	"boilerplate/internal/api/handlers"
+	grpc_handlers "boilerplate/internal/api/grpc/handlers"
+	grpc_middleware "boilerplate/internal/api/grpc/middleware"
+	http_handlers "boilerplate/internal/api/http/handlers"
 	"boilerplate/internal/model"
 	"boilerplate/internal/pkg/clients/db"
 	closer_pkg "boilerplate/internal/pkg/closer"
+	"boilerplate/internal/pkg/grpc_server"
 	"boilerplate/internal/pkg/http_server"
 	logger_pkg "boilerplate/internal/pkg/logger"
+	"boilerplate/internal/pkg/swagger"
 	"boilerplate/internal/repository"
 	"boilerplate/internal/service_provider"
 	"boilerplate/migrations"
+
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type App struct {
@@ -67,10 +77,88 @@ func (a *App) Run() error {
 	sp := service_provider.NewProvider(a.config, logger, repo)
 
 	// HTTP Server
-	httpServer := http_server.NewServer(a.config.API.Host, a.config.API.Port, handlers.NewHandler(logger, sp))
+	if 1 == 2 {
+		httpServer := http_server.NewServer(a.config.API.Host, a.config.API.HTTPPort, http_handlers.NewHandler(logger, sp))
+
+		go func() {
+			logger.Infof(ctx, "http server started on port %s", a.config.API.HTTPPort)
+			err := httpServer.Start()
+			if err != nil {
+				closer.CloseAll()
+				logger.Errorf(ctx, "start http server: %s", err.Error())
+			}
+		}()
+
+		closer.Add(func() error {
+			err := httpServer.Stop(ctx)
+			if err != nil {
+				return fmt.Errorf("stop http server: %w", err)
+			}
+			logger.Info(ctx, "http server stopped")
+			return nil
+		})
+	}
+
+	// GRPC Server
+	grpcMiddleware := grpc_middleware.NewMiddleware(
+		logger,
+		sp.GetAuthService(),
+	)
+
+	grpcHandlers := grpc_handlers.NewHandlers(sp)
+
+	grpcServer := grpc_server.NewServer(a.config.API.Host, a.config.API.GRPCPort,
+		[]grpc.UnaryServerInterceptor{
+			grpcMiddleware.Panic,
+			grpcMiddleware.Tracer,
+			grpcMiddleware.Logger,
+			grpcMiddleware.Validate,
+			grpcMiddleware.Auth,
+		},
+		grpcHandlers)
+	go func() {
+		logger.Infof(ctx, "grpc server started on port %s", a.config.API.GRPCPort)
+		err := grpcServer.Start()
+		if err != nil {
+			closer.CloseAll()
+			logger.Errorf(ctx, "start grpc server: %s", err.Error())
+		}
+	}()
+
+	closer.Add(func() error {
+		grpcServer.Stop()
+		logger.Info(ctx, "grpc server stopped")
+		return nil
+	})
+
+	// HTTP server
+	grpcConn, err := grpc.NewClient(
+		net.JoinHostPort(a.config.API.Host, a.config.API.GRPCPort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		closer.CloseAll()
+		return fmt.Errorf("create grpc client: %w", err)
+	}
+
+	router := http.NewServeMux()
+	swagger.Register(router)
+
+	gwRouter := runtime.NewServeMux()
+	router.Handle("/", gwRouter)
+
+	for _, grpcHandler := range grpcHandlers {
+		err := grpcHandler.RegisterHTTPHandler(ctx, gwRouter, grpcConn)
+		if err != nil {
+			closer.CloseAll()
+			return fmt.Errorf("register grpc handler http: %w", err)
+		}
+	}
+
+	httpServer := http_server.NewServer(a.config.API.Host, a.config.API.HTTPPort, router)
 
 	go func() {
-		logger.Infof(ctx, "http server started on port %s", a.config.API.Port)
+		logger.Infof(ctx, "http server started on port %s", a.config.API.HTTPPort)
 		err := httpServer.Start()
 		if err != nil {
 			closer.CloseAll()

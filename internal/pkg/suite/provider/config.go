@@ -20,7 +20,7 @@ func InitConfig() *model.Config {
 			SslMode:  false,
 		},
 		API: model.ConfigAPI{
-			Port:             "8080",
+			HTTPPort:         "8080",
 			AccessPrivateKey: "dd4dcf2eae3c3a6f097d69f49ce584852d66ac85505f5d264e1b6fb8f90d9019",
 			AccessTokenTTL:   10,
 			RefreshTokenTTL:  60,

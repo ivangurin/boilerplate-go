@@ -19,7 +19,8 @@ type ConfigDB struct {
 
 type ConfigAPI struct {
 	Host             string `yaml:"host" json:"host" mapstructure:"host" validate:"required"`
-	Port             string `yaml:"port" json:"port" mapstructure:"port" validate:"required"`
+	HTTPPort         string `yaml:"http-port" json:"http-port" mapstructure:"http-port" validate:"required"`
+	GRPCPort         string `yaml:"grpc-port" json:"grpc-port" mapstructure:"grpc-port" validate:"required"`
 	AccessPrivateKey string `yaml:"access-private-key" json:"access-private-key" mapstructure:"access-private-key" validate:"required"`
 	AccessTokenTTL   int    `yaml:"access-token-ttl" json:"token-ttl" mapstructure:"access-token-ttl" validate:"required"`
 	RefreshTokenTTL  int    `yaml:"refresh-token-ttl" json:"refresh-token-ttl" mapstructure:"refresh-token-ttl" validate:"required"`

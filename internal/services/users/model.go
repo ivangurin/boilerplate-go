@@ -1,20 +1,22 @@
 package users
 
 import (
+	"boilerplate/internal/model"
 	"boilerplate/internal/repository"
 	"time"
 )
 
 type User struct {
-	ID        int        `json:"id"`
-	Name      string     `json:"name"`
-	Email     string     `json:"email"`
-	IsAdmin   bool       `json:"is_admin"`
-	Password  string     `json:"-"`
-	Deleted   bool       `json:"deleted"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	ID        int            `json:"id"`
+	Name      string         `json:"name"`
+	Email     string         `json:"email"`
+	Role      model.UserRole `json:"role"`
+	IsAdmin   bool           `json:"is_admin"`
+	Password  string         `json:"-"`
+	Deleted   bool           `json:"deleted"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt *time.Time     `json:"deleted_at,omitempty"`
 }
 
 type UserCreateRequest struct {

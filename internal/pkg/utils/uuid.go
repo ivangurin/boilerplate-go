@@ -1,6 +1,10 @@
 package utils
 
-import "github.com/google/uuid"
+import (
+	"encoding/hex"
+
+	"github.com/google/uuid"
+)
 
 func UUID() uuid.UUID {
 	res, err := uuid.NewV7()
@@ -8,4 +12,9 @@ func UUID() uuid.UUID {
 		panic(err)
 	}
 	return res
+}
+
+func UniqueID() string {
+	id := UUID()
+	return hex.EncodeToString(id[:])
 }

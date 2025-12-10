@@ -7,11 +7,11 @@ import (
 	swagger_files "github.com/swaggo/files"
 	gin_swagger "github.com/swaggo/gin-swagger"
 
-	"boilerplate/internal/api/handlers/auth"
-	"boilerplate/internal/api/handlers/auth_public"
-	"boilerplate/internal/api/handlers/users"
-	"boilerplate/internal/api/middleware"
-	"boilerplate/internal/api/swagger"
+	"boilerplate/internal/api/http/handlers/auth"
+	"boilerplate/internal/api/http/handlers/auth_public"
+	"boilerplate/internal/api/http/handlers/users"
+	"boilerplate/internal/api/http/middleware"
+	"boilerplate/internal/api/http/swagger"
 	logger_pkg "boilerplate/internal/pkg/logger"
 	"boilerplate/internal/service_provider"
 )

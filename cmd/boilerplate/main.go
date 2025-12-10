@@ -111,7 +111,7 @@ func defineFlags(cmd *cobra.Command, config *model.Config) error {
 	if err = bindStringVar(cmd, &config.DB.Password, "db.password", "postgres", "Database Password"); err != nil {
 		return fmt.Errorf("bind db.password: %w", err)
 	}
-	if err = bindStringVar(cmd, &config.DB.Name, "db.name", "greenaid", "Database Name"); err != nil {
+	if err = bindStringVar(cmd, &config.DB.Name, "db.name", "boilerplate", "Database Name"); err != nil {
 		return fmt.Errorf("bind db.name: %w", err)
 	}
 	if err = bindBoolVar(cmd, &config.DB.SslMode, "db.ssl-mode", false, "Database SSL Mode"); err != nil {
@@ -122,8 +122,11 @@ func defineFlags(cmd *cobra.Command, config *model.Config) error {
 	if err = bindStringVar(cmd, &config.API.Host, "api.host", "127.0.0.1", "API Host"); err != nil {
 		return fmt.Errorf("bind api.host: %w", err)
 	}
-	if err = bindStringVar(cmd, &config.API.Port, "api.port", "8080", "API Port"); err != nil {
-		return fmt.Errorf("bind api.port: %w", err)
+	if err = bindStringVar(cmd, &config.API.HTTPPort, "api.http-port", "8080", "API HTTP Port"); err != nil {
+		return fmt.Errorf("bind api.http-port: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.API.GRPCPort, "api.grpc-port", "8082", "API GRPC Port"); err != nil {
+		return fmt.Errorf("bind api.grpc-port: %w", err)
 	}
 	if err = bindStringVar(cmd, &config.API.AccessPrivateKey, "api.access-private-key", "dd4dcf2eae3c3a6f097d69f49ce584852d66ac85505f5d264e1b6fb8f90d9019", "API Access Private Key"); err != nil {
 		return fmt.Errorf("bind api.access-private-key: %w", err)
