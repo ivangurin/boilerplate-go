@@ -100,14 +100,12 @@ func (a *App) Run() error {
 	}
 
 	// GRPC Server
-	grpcMiddleware := grpc_middleware.NewMiddleware(
-		logger,
-		sp.GetAuthService(),
-	)
-
+	grpcMiddleware := grpc_middleware.NewMiddleware(logger, sp.GetAuthService())
 	grpcHandlers := grpc_handlers.NewHandlers(sp)
 
-	grpcServer := grpc_server.NewServer(a.config.API.Host, a.config.API.GRPCPort,
+	grpcServer := grpc_server.NewServer(
+		a.config.API.Host,
+		a.config.API.GRPCPort,
 		[]grpc.UnaryServerInterceptor{
 			grpcMiddleware.Panic,
 			grpcMiddleware.Tracer,
@@ -115,11 +113,12 @@ func (a *App) Run() error {
 			grpcMiddleware.Validate,
 			grpcMiddleware.Auth,
 		},
-		grpcHandlers)
+		grpcHandlers,
+	)
+
 	go func() {
 		logger.Infof(ctx, "grpc server started on port %s", a.config.API.GRPCPort)
-		err := grpcServer.Start()
-		if err != nil {
+		if err := grpcServer.Start(); err != nil {
 			closer.CloseAll()
 			logger.Errorf(ctx, "start grpc server: %s", err.Error())
 		}
@@ -131,44 +130,25 @@ func (a *App) Run() error {
 		return nil
 	})
 
-	// HTTP server
-	grpcConn, err := grpc.NewClient(
-		net.JoinHostPort(a.config.API.Host, a.config.API.GRPCPort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	// HTTP Gateway Server
+	httpRouter, err := a.setupHTTPGateway(ctx, grpcHandlers)
 	if err != nil {
 		closer.CloseAll()
-		return fmt.Errorf("create grpc client: %w", err)
+		return fmt.Errorf("setup http gateway: %w", err)
 	}
 
-	router := http.NewServeMux()
-	swagger.Register(router)
-
-	gwRouter := runtime.NewServeMux()
-	router.Handle("/", gwRouter)
-
-	for _, grpcHandler := range grpcHandlers {
-		err := grpcHandler.RegisterHTTPHandler(ctx, gwRouter, grpcConn)
-		if err != nil {
-			closer.CloseAll()
-			return fmt.Errorf("register grpc handler http: %w", err)
-		}
-	}
-
-	httpServer := http_server.NewServer(a.config.API.Host, a.config.API.HTTPPort, router)
+	httpServer := http_server.NewServer(a.config.API.Host, a.config.API.HTTPPort, httpRouter)
 
 	go func() {
 		logger.Infof(ctx, "http server started on port %s", a.config.API.HTTPPort)
-		err := httpServer.Start()
-		if err != nil {
+		if err := httpServer.Start(); err != nil {
 			closer.CloseAll()
 			logger.Errorf(ctx, "start http server: %s", err.Error())
 		}
 	}()
 
 	closer.Add(func() error {
-		err := httpServer.Stop(ctx)
-		if err != nil {
+		if err := httpServer.Stop(ctx); err != nil {
 			return fmt.Errorf("stop http server: %w", err)
 		}
 		logger.Info(ctx, "http server stopped")
@@ -178,4 +158,34 @@ func (a *App) Run() error {
 	logger.Info(ctx, "App is running...")
 
 	return nil
+}
+
+func (a *App) setupHTTPGateway(ctx context.Context, grpcHandlers []model.GRPCHandler) (*http.ServeMux, error) {
+	// Create gRPC client connection
+	grpcConn, err := grpc.NewClient(
+		net.JoinHostPort(a.config.API.Host, a.config.API.GRPCPort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("create grpc client: %w", err)
+	}
+
+	// Setup main router
+	router := http.NewServeMux()
+
+	// Register swagger UI
+	swagger.Register(router)
+
+	// Setup gRPC gateway
+	gwRouter := runtime.NewServeMux()
+	for _, handler := range grpcHandlers {
+		if err := handler.RegisterHTTPHandler(ctx, gwRouter, grpcConn); err != nil {
+			return nil, fmt.Errorf("register grpc handler: %w", err)
+		}
+	}
+
+	// Mount gateway to main router
+	router.Handle("/", gwRouter)
+
+	return router, nil
 }
