@@ -69,6 +69,10 @@ gen-proto:
 	go tool buf generate
 	./scripts/merge-swagger.sh
 
+.PHONY: lint-proto
+lint-proto:
+	go tool buf lint
+
 .PHONY: swagger-ui
 swagger-ui:
 	@rm -rf pkg/swagger-ui
