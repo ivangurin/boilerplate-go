@@ -8,7 +8,7 @@ import (
 	"boilerplate/pkg/pb"
 )
 
-func (h *handler) Create(ctx context.Context, req *pb.UserCreateRequest) (*pb.User, error) {
+func (h *handler) Create(ctx context.Context, req *pb.UserCreateRequest) (*pb.UserCreteResponse, error) {
 	resp, err := h.usersService.Create(ctx, &users.UserCreateRequest{
 		Name:     req.GetName(),
 		Email:    req.GetEmail(),
@@ -18,5 +18,7 @@ func (h *handler) Create(ctx context.Context, req *pb.UserCreateRequest) (*pb.Us
 		return nil, grpc.Error(err)
 	}
 
-	return ToUser(resp), nil
+	return &pb.UserCreteResponse{
+		User: ToUser(resp),
+	}, nil
 }

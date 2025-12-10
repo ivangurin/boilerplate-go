@@ -9,7 +9,7 @@ import (
 	"boilerplate/pkg/pb"
 )
 
-func (h *handler) Update(ctx context.Context, req *pb.UserUpdateRequest) (*pb.User, error) {
+func (h *handler) Update(ctx context.Context, req *pb.UserUpdateRequest) (*pb.UserUpdateResponse, error) {
 	resp, err := h.usersService.Update(ctx, &users.UserUpdateRequest{
 		ID:       convert.ToInt(req.GetId()),
 		Name:     req.Name,
@@ -19,5 +19,7 @@ func (h *handler) Update(ctx context.Context, req *pb.UserUpdateRequest) (*pb.Us
 		return nil, grpc.Error(err)
 	}
 
-	return ToUser(resp), nil
+	return &pb.UserUpdateResponse{
+		User: ToUser(resp),
+	}, nil
 }

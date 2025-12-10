@@ -96,7 +96,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/usersUser"
+              "$ref": "#/definitions/authAuthMeResponse"
             }
           },
           "default": {
@@ -151,7 +151,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/usersUser"
+              "$ref": "#/definitions/usersUserCreteResponse"
             }
           },
           "default": {
@@ -183,7 +183,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/usersUser"
+              "$ref": "#/definitions/usersUserGetResponse"
             }
           },
           "default": {
@@ -242,7 +242,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/usersUser"
+              "$ref": "#/definitions/usersUserUpdateResponse"
             }
           },
           "default": {
@@ -295,6 +295,14 @@
         },
         "refresh_token": {
           "type": "string"
+        }
+      }
+    },
+    "authAuthMeResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/usersUser"
         }
       }
     },
@@ -403,6 +411,30 @@
         },
         "password": {
           "type": "string"
+        }
+      }
+    },
+    "usersUserCreteResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/usersUser"
+        }
+      }
+    },
+    "usersUserGetResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/usersUser"
+        }
+      }
+    },
+    "usersUserUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/usersUser"
         }
       }
     }

@@ -65,7 +65,7 @@ service AuthAPI {
         };
     }
 
-    rpc Me (google.protobuf.Empty) returns (users.User) {
+    rpc Me (google.protobuf.Empty) returns (AuthMeResponse) {
         option (google.api.http) = {
             get: "/auth/me"
         };
@@ -91,3 +91,6 @@ message AuthRefreshResponse{
     string refresh_token = 2 [json_name = "refresh_token"];
 }
 
+message AuthMeResponse{
+    users.User user = 1 [json_name = "user"];
+}

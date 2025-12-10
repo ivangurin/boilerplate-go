@@ -454,3 +454,132 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AuthRefreshResponseValidationError{}
+
+// Validate checks the field values on AuthMeResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AuthMeResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AuthMeResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AuthMeResponseMultiError,
+// or nil if none found.
+func (m *AuthMeResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AuthMeResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetUser()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AuthMeResponseValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AuthMeResponseValidationError{
+					field:  "User",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUser()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AuthMeResponseValidationError{
+				field:  "User",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AuthMeResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// AuthMeResponseMultiError is an error wrapping multiple validation errors
+// returned by AuthMeResponse.ValidateAll() if the designated constraints
+// aren't met.
+type AuthMeResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AuthMeResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AuthMeResponseMultiError) AllErrors() []error { return m }
+
+// AuthMeResponseValidationError is the validation error returned by
+// AuthMeResponse.Validate if the designated constraints aren't met.
+type AuthMeResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AuthMeResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AuthMeResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AuthMeResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AuthMeResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AuthMeResponseValidationError) ErrorName() string { return "AuthMeResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AuthMeResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAuthMeResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AuthMeResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AuthMeResponseValidationError{}

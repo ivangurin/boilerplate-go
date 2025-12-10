@@ -8,11 +8,13 @@ import (
 	"boilerplate/pkg/pb"
 )
 
-func (h *handler) Get(ctx context.Context, req *pb.UserGetRequest) (*pb.User, error) {
+func (h *handler) Get(ctx context.Context, req *pb.UserGetRequest) (*pb.UserGetResponse, error) {
 	resp, err := h.usersService.Get(ctx, convert.ToInt(req.Id))
 	if err != nil {
 		return nil, grpc.Error(err)
 	}
 
-	return ToUser(resp), nil
+	return &pb.UserGetResponse{
+		User: ToUser(resp),
+	}, nil
 }

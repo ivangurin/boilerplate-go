@@ -225,6 +225,50 @@ func (x *AuthRefreshResponse) GetRefreshToken() string {
 	return ""
 }
 
+type AuthMeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AuthMeResponse) Reset() {
+	*x = AuthMeResponse{}
+	mi := &file_auth_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AuthMeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuthMeResponse) ProtoMessage() {}
+
+func (x *AuthMeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuthMeResponse.ProtoReflect.Descriptor instead.
+func (*AuthMeResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *AuthMeResponse) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
 var File_auth_proto protoreflect.FileDescriptor
 
 const file_auth_proto_rawDesc = "" +
@@ -241,12 +285,14 @@ const file_auth_proto_rawDesc = "" +
 	"\rrefresh_token\x18\x01 \x01(\tR\rrefresh_token\"_\n" +
 	"\x13AuthRefreshResponse\x12\"\n" +
 	"\faccess_token\x18\x01 \x01(\tR\faccess_token\x12$\n" +
-	"\rrefresh_token\x18\x02 \x01(\tR\rrefresh_token2\xcf\x02\n" +
+	"\rrefresh_token\x18\x02 \x01(\tR\rrefresh_token\"1\n" +
+	"\x0eAuthMeResponse\x12\x1f\n" +
+	"\x04user\x18\x01 \x01(\v2\v.users.UserR\x04user2\xd8\x02\n" +
 	"\aAuthAPI\x12U\n" +
 	"\x05Login\x12\x16.auth.AuthLoginRequest\x1a\x17.auth.AuthLoginResponse\"\x1b\x92A\x02b\x00\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/auth/login\x12Q\n" +
 	"\x06Logout\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\"\x17\x82\xd3\xe4\x93\x02\x11:\x01*\"\f/auth/logout\x12]\n" +
-	"\aRefresh\x12\x18.auth.AuthRefreshRequest\x1a\x19.auth.AuthRefreshResponse\"\x1d\x92A\x02b\x00\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/auth/refresh\x12;\n" +
-	"\x02Me\x12\x16.google.protobuf.Empty\x1a\v.users.User\"\x10\x82\xd3\xe4\x93\x02\n" +
+	"\aRefresh\x12\x18.auth.AuthRefreshRequest\x1a\x19.auth.AuthRefreshResponse\"\x1d\x92A\x02b\x00\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/auth/refresh\x12D\n" +
+	"\x02Me\x12\x16.google.protobuf.Empty\x1a\x14.auth.AuthMeResponse\"\x10\x82\xd3\xe4\x93\x02\n" +
 	"\x12\b/auth/meB\xc6\x01\x92Aj\x12\x11\n" +
 	"\bAuth API2\x051.0.0*\x02\x01\x022\x10application/json:\x10application/jsonZ\x1f\n" +
 	"\x1d\n" +
@@ -268,29 +314,31 @@ func file_auth_proto_rawDescGZIP() []byte {
 	return file_auth_proto_rawDescData
 }
 
-var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_auth_proto_goTypes = []any{
 	(*AuthLoginRequest)(nil),    // 0: auth.AuthLoginRequest
 	(*AuthLoginResponse)(nil),   // 1: auth.AuthLoginResponse
 	(*AuthRefreshRequest)(nil),  // 2: auth.AuthRefreshRequest
 	(*AuthRefreshResponse)(nil), // 3: auth.AuthRefreshResponse
-	(*emptypb.Empty)(nil),       // 4: google.protobuf.Empty
+	(*AuthMeResponse)(nil),      // 4: auth.AuthMeResponse
 	(*User)(nil),                // 5: users.User
+	(*emptypb.Empty)(nil),       // 6: google.protobuf.Empty
 }
 var file_auth_proto_depIdxs = []int32{
-	0, // 0: auth.AuthAPI.Login:input_type -> auth.AuthLoginRequest
-	4, // 1: auth.AuthAPI.Logout:input_type -> google.protobuf.Empty
-	2, // 2: auth.AuthAPI.Refresh:input_type -> auth.AuthRefreshRequest
-	4, // 3: auth.AuthAPI.Me:input_type -> google.protobuf.Empty
-	1, // 4: auth.AuthAPI.Login:output_type -> auth.AuthLoginResponse
-	4, // 5: auth.AuthAPI.Logout:output_type -> google.protobuf.Empty
-	3, // 6: auth.AuthAPI.Refresh:output_type -> auth.AuthRefreshResponse
-	5, // 7: auth.AuthAPI.Me:output_type -> users.User
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	5, // 0: auth.AuthMeResponse.user:type_name -> users.User
+	0, // 1: auth.AuthAPI.Login:input_type -> auth.AuthLoginRequest
+	6, // 2: auth.AuthAPI.Logout:input_type -> google.protobuf.Empty
+	2, // 3: auth.AuthAPI.Refresh:input_type -> auth.AuthRefreshRequest
+	6, // 4: auth.AuthAPI.Me:input_type -> google.protobuf.Empty
+	1, // 5: auth.AuthAPI.Login:output_type -> auth.AuthLoginResponse
+	6, // 6: auth.AuthAPI.Logout:output_type -> google.protobuf.Empty
+	3, // 7: auth.AuthAPI.Refresh:output_type -> auth.AuthRefreshResponse
+	4, // 8: auth.AuthAPI.Me:output_type -> auth.AuthMeResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_auth_proto_init() }
@@ -305,7 +353,7 @@ func file_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_proto_rawDesc), len(file_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -37,20 +37,20 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service UsersAPI {
-    rpc Create (UserCreateRequest) returns (User) {
+    rpc Create (UserCreateRequest) returns (UserCreteResponse) {
         option (google.api.http) = {
             post: "/users"
             body: "*"
         };
     }
 
-    rpc Get (UserGetRequest) returns (User) {
+    rpc Get (UserGetRequest) returns (UserGetResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
         };
     }
 
-     rpc Update (UserUpdateRequest) returns (User) {
+     rpc Update (UserUpdateRequest) returns (UserUpdateResponse) {
         option (google.api.http) = {
             patch: "/users/{id}"
             body: "*"
@@ -76,20 +76,32 @@ message User {
     optional google.protobuf.Timestamp deleted_at = 9 [json_name = "deleted_at"];
 }
 
-message UserGetRequest {
-    int64 id = 1 [json_name = "id"];
-}
-
 message UserCreateRequest {
     string email = 1 [json_name = "email"];
     string name = 2 [json_name = "name"];
     string password = 3 [json_name = "password"];
 }
 
+message UserCreteResponse {
+    User user = 1 [json_name = "user"];
+}
+
+message UserGetRequest {
+    int64 id = 1 [json_name = "id"];
+}
+
+message UserGetResponse {
+    User user = 1 [json_name = "user"];
+}
+
 message UserUpdateRequest {
     int64 id = 1 [json_name = "id"];
     optional  string name = 2 [json_name = "name"];
     optional  string password = 3 [json_name = "password"];
+}
+
+message UserUpdateResponse {
+    User user = 1 [json_name = "user"];
 }
 
 message UserDeleteRequest {

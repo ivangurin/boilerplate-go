@@ -33,7 +33,7 @@ type AuthAPIClient interface {
 	Login(ctx context.Context, in *AuthLoginRequest, opts ...grpc.CallOption) (*AuthLoginResponse, error)
 	Logout(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	Refresh(ctx context.Context, in *AuthRefreshRequest, opts ...grpc.CallOption) (*AuthRefreshResponse, error)
-	Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error)
+	Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AuthMeResponse, error)
 }
 
 type authAPIClient struct {
@@ -74,9 +74,9 @@ func (c *authAPIClient) Refresh(ctx context.Context, in *AuthRefreshRequest, opt
 	return out, nil
 }
 
-func (c *authAPIClient) Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error) {
+func (c *authAPIClient) Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AuthMeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(User)
+	out := new(AuthMeResponse)
 	err := c.cc.Invoke(ctx, AuthAPI_Me_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ type AuthAPIServer interface {
 	Login(context.Context, *AuthLoginRequest) (*AuthLoginResponse, error)
 	Logout(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	Refresh(context.Context, *AuthRefreshRequest) (*AuthRefreshResponse, error)
-	Me(context.Context, *emptypb.Empty) (*User, error)
+	Me(context.Context, *emptypb.Empty) (*AuthMeResponse, error)
 	mustEmbedUnimplementedAuthAPIServer()
 }
 
@@ -111,7 +111,7 @@ func (UnimplementedAuthAPIServer) Logout(context.Context, *emptypb.Empty) (*empt
 func (UnimplementedAuthAPIServer) Refresh(context.Context, *AuthRefreshRequest) (*AuthRefreshResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Refresh not implemented")
 }
-func (UnimplementedAuthAPIServer) Me(context.Context, *emptypb.Empty) (*User, error) {
+func (UnimplementedAuthAPIServer) Me(context.Context, *emptypb.Empty) (*AuthMeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Me not implemented")
 }
 func (UnimplementedAuthAPIServer) mustEmbedUnimplementedAuthAPIServer() {}
