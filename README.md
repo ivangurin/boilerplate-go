@@ -50,6 +50,7 @@ green-aid-backend/
 │   │   ├── logger/                    # Логирование (zap)
 │   │   ├── metadata/                  # Context metadata (request_id, ip, user_id)
 │   │   ├── pwd/                       # Password hashing (bcrypt)
+│   │   ├── swagger/                   # Swagger 
 │   │   ├── suite/                     # Тестовые утилиты
 │   │   │   ├── factory/               # Фабрики тестовых данных
 │   │   │   └── provider/              # Провайдеры для тестов
@@ -67,16 +68,9 @@ green-aid-backend/
 │   └── pb/                            # Сгенерированные protobuf файлы
 │       ├── auth.*                     # Auth (pb.go, pb.gw.go, pb.validate.go, grpc.pb.go)
 │       ├── users.*                    # Users (pb.go, pb.gw.go, pb.validate.go, grpc.pb.go)
-│       ├── api.swagger.json           # OpenAPI спецификация
-│       ├── google/api/                # Google API proto
-│       ├── protoc-gen-openapiv2/      # OpenAPI аннотации
-│       └── validate/                  # Validate proto
 ├── proto/                             # Protobuf определения
 │   ├── auth.proto                     # Auth API схема
 │   ├── users.proto                    # Users API схема
-│   ├── google/api/                    # Google API proto
-│   ├── protoc-gen-openapiv2/options/  # OpenAPI аннотации
-│   └── validate/                      # Validate правила
 ├── bin/                               # Скомпилированные бинарники
 ├── .github/                           # GitHub Actions
 ├── .gitlab-ci.yml                     # GitLab CI/CD
