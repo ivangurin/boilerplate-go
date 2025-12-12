@@ -4,5 +4,5 @@
 .DS_Store
 *.tmp
 *.lock
-
-/bin
+.proto-deps
+bin
