@@ -2,7 +2,7 @@
 
 set -e
 
-OUTPUT_FILE="pkg/swagger/swagger.json"
+OUTPUT_FILE="internal/pkg/swagger/swagger.json"
 # Находим все swagger файлы кроме swagger.json и сортируем по имени
 SWAGGER_FILES=($(find pkg/pb -name "*.swagger.json" ! -name "swagger.json" | sort))
 

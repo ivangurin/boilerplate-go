@@ -1,34 +1,24 @@
 package swagger
 
 import (
-	"bufio"
-	"io"
+	_ "embed"
 	"net/http"
-	"os"
+
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
+//go:embed swagger.json
+var swaggerJSON []byte
+
 func Register(mux *http.ServeMux) {
-	// swagger-ui
-	fs := http.FileServer(http.Dir("pkg/swagger-ui"))
-	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
+	// Swagger UI
+	mux.Handle("/swagger/", httpSwagger.Handler(
+		httpSwagger.URL("/swagger.json"),
+	))
 
 	// swagger.json
-	mux.HandleFunc("/swagger.json", func(w http.ResponseWriter, _ *http.Request) {
-		file, err := os.Open("pkg/swagger/swagger.json")
-		if err != nil {
-			http.Error(w, "swagger not found", http.StatusNotFound)
-		}
-		defer func() {
-			err := file.Close()
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-		}()
-
-		reader := bufio.NewReader(file)
-		_, err = io.Copy(w, reader)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+	mux.HandleFunc("/swagger.json", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(swaggerJSON)
 	})
 }
