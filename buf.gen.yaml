@@ -4,7 +4,19 @@ managed:
   enabled: true
   override:
     - file_option: go_package_prefix
-      value: boilerplate/pkg/pb
+      value: greenaid/pkg/pb
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis
+      path: google/api
+      value: google.golang.org/genproto/googleapis/api/annotations
+    - file_option: go_package
+      module: buf.build/grpc-ecosystem/grpc-gateway
+      path: protoc-gen-openapiv2/options
+      value: github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options
+    - file_option: go_package
+      module: buf.build/envoyproxy/protoc-gen-validate
+      path: validate
+      value: github.com/envoyproxy/protoc-gen-validate/validate
 plugins:
   - local: protoc-gen-go
     out: pkg/pb

@@ -7,9 +7,9 @@
 package pb
 
 import (
-	_ "boilerplate/pkg/pb/google/api"
-	_ "boilerplate/pkg/pb/protoc-gen-openapiv2/options"
-	_ "boilerplate/pkg/pb/validate"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -293,14 +293,14 @@ const file_auth_proto_rawDesc = "" +
 	"\x06Logout\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\"\x17\x82\xd3\xe4\x93\x02\x11:\x01*\"\f/auth/logout\x12]\n" +
 	"\aRefresh\x12\x18.auth.AuthRefreshRequest\x1a\x19.auth.AuthRefreshResponse\"\x1d\x92A\x02b\x00\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/auth/refresh\x12D\n" +
 	"\x02Me\x12\x16.google.protobuf.Empty\x1a\x14.auth.AuthMeResponse\"\x10\x82\xd3\xe4\x93\x02\n" +
-	"\x12\b/auth/meB\xc6\x01\x92Aj\x12\x11\n" +
+	"\x12\b/auth/meB\xc3\x01\x92Aj\x12\x11\n" +
 	"\bAuth API2\x051.0.0*\x02\x01\x022\x10application/json:\x10application/jsonZ\x1f\n" +
 	"\x1d\n" +
 	"\x06x-auth\x12\x13\b\x02\x1a\rauthorization \x02b\f\n" +
 	"\n" +
 	"\n" +
 	"\x06x-auth\x12\x00\n" +
-	"\bcom.authB\tAuthProtoP\x01Z\x12boilerplate/pkg/pb\xa2\x02\x03AXX\xaa\x02\x04Auth\xca\x02\x04Auth\xe2\x02\x10Auth\\GPBMetadata\xea\x02\x04Authb\x06proto3"
+	"\bcom.authB\tAuthProtoP\x01Z\x0fgreenaid/pkg/pb\xa2\x02\x03AXX\xaa\x02\x04Auth\xca\x02\x04Auth\xe2\x02\x10Auth\\GPBMetadata\xea\x02\x04Authb\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once

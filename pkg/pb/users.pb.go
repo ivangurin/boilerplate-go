@@ -7,9 +7,9 @@
 package pb
 
 import (
-	_ "boilerplate/pkg/pb/google/api"
-	_ "boilerplate/pkg/pb/protoc-gen-openapiv2/options"
-	_ "boilerplate/pkg/pb/validate"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	_ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -520,7 +520,7 @@ const file_users_proto_rawDesc = "" +
 	"\x06Create\x12\x18.users.UserCreateRequest\x1a\x18.users.UserCreteResponse\"\x11\x82\xd3\xe4\x93\x02\v:\x01*\"\x06/users\x12I\n" +
 	"\x03Get\x12\x15.users.UserGetRequest\x1a\x16.users.UserGetResponse\"\x13\x82\xd3\xe4\x93\x02\r\x12\v/users/{id}\x12U\n" +
 	"\x06Update\x12\x18.users.UserUpdateRequest\x1a\x19.users.UserUpdateResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*2\v/users/{id}\x12O\n" +
-	"\x06Delete\x12\x18.users.UserDeleteRequest\x1a\x16.google.protobuf.Empty\"\x13\x82\xd3\xe4\x93\x02\r*\v/users/{id}B\xcd\x01\x92Ak\x12\x12\n" +
+	"\x06Delete\x12\x18.users.UserDeleteRequest\x1a\x16.google.protobuf.Empty\"\x13\x82\xd3\xe4\x93\x02\r*\v/users/{id}B\xca\x01\x92Ak\x12\x12\n" +
 	"\tUsers API2\x051.0.0*\x02\x01\x022\x10application/json:\x10application/jsonZ\x1f\n" +
 	"\x1d\n" +
 	"\x06x-auth\x12\x13\b\x02\x1a\rauthorization \x02b\f\n" +
@@ -528,7 +528,7 @@ const file_users_proto_rawDesc = "" +
 	"\n" +
 	"\x06x-auth\x12\x00\n" +
 	"\tcom.usersB\n" +
-	"UsersProtoP\x01Z\x12boilerplate/pkg/pb\xa2\x02\x03UXX\xaa\x02\x05Users\xca\x02\x05Users\xe2\x02\x11Users\\GPBMetadata\xea\x02\x05Usersb\x06proto3"
+	"UsersProtoP\x01Z\x0fgreenaid/pkg/pb\xa2\x02\x03UXX\xaa\x02\x05Users\xca\x02\x05Users\xe2\x02\x11Users\\GPBMetadata\xea\x02\x05Usersb\x06proto3"
 
 var (
 	file_users_proto_rawDescOnce sync.Once

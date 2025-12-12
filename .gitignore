@@ -3,6 +3,5 @@
 .github
 .DS_Store
 *.tmp
-*.lock
 
 /bin
