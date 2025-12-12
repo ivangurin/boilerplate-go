@@ -1,3 +1,4 @@
+LOCAL_BIN:=$(CURDIR)/bin
 VERSION ?= dev
 DB_NAME=boilerplate
 TEST_DB_NAME=boilerplate_test
@@ -64,12 +65,28 @@ gen-swag:
 	go tool swag fmt	
 	go tool swag init --parseDependency --parseInternal -g handlers.go -d internal/api/handlers -o internal/api/swagger
 
+.PHONY: proto-deps
+proto-deps:
+	@echo "Exporting proto dependencies for IDE..."
+	@rm -rf .proto-deps
+	@go tool buf export buf.build/envoyproxy/protoc-gen-validate --output .proto-deps
+	@go tool buf export buf.build/googleapis/googleapis --output .proto-deps
+	@go tool buf export buf.build/grpc-ecosystem/grpc-gateway --output .proto-deps
+	@echo "Proto dependencies exported to .proto-deps/"
+
+.install-proto-plugins:
+	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate@latest
+	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
+	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+
 .PHONY: gen-proto
-gen-proto:
+gen-proto: .install-proto-plugins
 	@echo "Updating buf dependencies..."
 	@go tool buf dep update
 	@echo "Generating proto files..."
-	@go tool buf generate
+	@PATH=$(LOCAL_BIN):"$(PATH)" go tool buf generate
 	@rm ./buf.lock
 	@echo "Merging swagger files..."
 	go tool swagger mixin --ignore-conflicts -o internal/pkg/swagger/swagger.json pkg/pb/*.swagger.json
