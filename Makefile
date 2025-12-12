@@ -70,10 +70,12 @@ gen-proto:
 	@go tool buf dep update
 	@echo "Generating proto files..."
 	@go tool buf generate
+	@rm ./buf.lock
+	@echo "Merging swagger files..."
 	go tool swagger mixin --ignore-conflicts -o internal/pkg/swagger/swagger.json pkg/pb/*.swagger.json
 	@find pkg/pb -name "*.swagger.json" -type f -delete
 	@echo "Proto generation completed successfully"
-
+	
 .PHONY: lint-proto
 lint-proto:
 	go tool buf lint
