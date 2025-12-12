@@ -1,30 +1,37 @@
 {
-  "swagger": "2.0",
-  "info": {
-    "title": "Boilerplate API",
-    "version": "1.0.0"
-  },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],
   "produces": [
     "application/json"
   ],
-  "securityDefinitions": {
-    "x-auth": {
-      "type": "apiKey",
-      "in": "header",
-      "name": "authorization"
-    }
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "title": "Auth API",
+    "version": "1.0.0"
   },
   "paths": {
     "/auth/login": {
       "post": {
+        "security": [],
+        "tags": [
+          "AuthAPI"
+        ],
         "operationId": "AuthAPI_Login",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authAuthLoginRequest"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -38,32 +45,30 @@
               "$ref": "#/definitions/rpcStatus"
             }
           }
-        },
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "AuthAPI"
+        ],
+        "operationId": "AuthAPI_Logout",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/authAuthLoginRequest"
+              "type": "object"
             }
           }
         ],
-        "tags": [
-          "AuthAPI"
-        ],
-        "security": []
-      }
-    },
-    "/auth/logout": {
-      "post": {
-        "operationId": "AuthAPI_Logout",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "type": "object",
-              "properties": {}
+              "type": "object"
             }
           },
           "default": {
@@ -72,25 +77,14 @@
               "$ref": "#/definitions/rpcStatus"
             }
           }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          }
-        ],
-        "tags": [
-          "AuthAPI"
-        ]
+        }
       }
     },
     "/auth/me": {
       "get": {
+        "tags": [
+          "AuthAPI"
+        ],
         "operationId": "AuthAPI_Me",
         "responses": {
           "200": {
@@ -105,15 +99,26 @@
               "$ref": "#/definitions/rpcStatus"
             }
           }
-        },
-        "tags": [
-          "AuthAPI"
-        ]
+        }
       }
     },
     "/auth/refresh": {
       "post": {
+        "security": [],
+        "tags": [
+          "AuthAPI"
+        ],
         "operationId": "AuthAPI_Refresh",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authAuthRefreshRequest"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -127,26 +132,25 @@
               "$ref": "#/definitions/rpcStatus"
             }
           }
-        },
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "tags": [
+          "UsersAPI"
+        ],
+        "operationId": "UsersAPI_Create",
         "parameters": [
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/authAuthRefreshRequest"
+              "$ref": "#/definitions/usersUserCreateRequest"
             }
           }
         ],
-        "tags": [
-          "AuthAPI"
-        ],
-        "security": []
-      }
-    },
-    "/users": {
-      "post": {
-        "operationId": "UsersAPI_Create",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -160,25 +164,24 @@
               "$ref": "#/definitions/rpcStatus"
             }
           }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/usersUserCreateRequest"
-            }
-          }
-        ],
-        "tags": [
-          "UsersAPI"
-        ]
+        }
       }
     },
     "/users/{id}": {
       "get": {
+        "tags": [
+          "UsersAPI"
+        ],
         "operationId": "UsersAPI_Get",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -192,28 +195,27 @@
               "$ref": "#/definitions/rpcStatus"
             }
           }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "UsersAPI"
-        ]
+        }
       },
       "delete": {
+        "tags": [
+          "UsersAPI"
+        ],
         "operationId": "UsersAPI_Delete",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "type": "object",
-              "properties": {}
+              "type": "object"
             }
           },
           "default": {
@@ -222,22 +224,30 @@
               "$ref": "#/definitions/rpcStatus"
             }
           }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "UsersAPI"
-        ]
+        }
       },
       "patch": {
+        "tags": [
+          "UsersAPI"
+        ],
         "operationId": "UsersAPI_Update",
+        "parameters": [
+          {
+            "type": "string",
+            "format": "int64",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UsersAPIUpdateBody"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -251,31 +261,22 @@
               "$ref": "#/definitions/rpcStatus"
             }
           }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "int64"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/UsersAPIUpdateBody"
-            }
-          }
-        ],
-        "tags": [
-          "UsersAPI"
-        ]
+        }
       }
     }
   },
   "definitions": {
+    "UsersAPIUpdateBody": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
     "authAuthLoginRequest": {
       "type": "object",
       "properties": {
@@ -341,62 +342,51 @@
           "type": "integer",
           "format": "int32"
         },
-        "message": {
-          "type": "string"
-        },
         "details": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/protobufAny"
           }
+        },
+        "message": {
+          "type": "string"
         }
       }
     },
     "usersUser": {
       "type": "object",
       "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deleted": {
+          "type": "boolean"
+        },
+        "deleted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "email": {
+          "type": "string"
+        },
         "id": {
           "type": "string",
           "format": "int64"
         },
-        "name": {
-          "type": "string"
+        "is_admin": {
+          "type": "boolean"
         },
-        "email": {
+        "name": {
           "type": "string"
         },
         "role": {
           "type": "string"
         },
-        "is_admin": {
-          "type": "boolean"
-        },
-        "deleted": {
-          "type": "boolean"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
         "updated_at": {
           "type": "string",
           "format": "date-time"
-        },
-        "deleted_at": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "UsersAPIUpdateBody": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
         }
       }
     },
@@ -439,6 +429,18 @@
       }
     }
   },
+  "securityDefinitions": {
+    "x-auth": {
+      "type": "apiKey",
+      "name": "authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "x-auth": []
+    }
+  ],
   "tags": [
     {
       "name": "AuthAPI"

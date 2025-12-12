@@ -67,20 +67,13 @@ gen-swag:
 .PHONY: gen-proto
 gen-proto:
 	go tool buf generate
-	./scripts/merge-swagger.sh
+	go tool swagger mixin --ignore-conflicts -o internal/pkg/swagger/swagger.json pkg/pb/*.swagger.json
+	@find pkg/pb -name "*.swagger.json" -type f -delete
+	@echo "Swagger files merged successfully"
 
 .PHONY: lint-proto
 lint-proto:
 	go tool buf lint
-
-.PHONY: swagger-ui
-swagger-ui:
-	@rm -rf pkg/swagger-ui
-	@mkdir -p pkg/swagger-ui
-	@echo "Downloading Swagger UI..."
-	@curl -L https://github.com/swagger-api/swagger-ui/archive/refs/heads/master.tar.gz | tar xz --strip=2 -C pkg/swagger-ui swagger-ui-master/dist
-	@sed -i '' 's|https://petstore.swagger.io/v2/swagger.json|/swagger.json|g' pkg/swagger-ui/swagger-initializer.js
-	@echo "Swagger UI downloaded to pkg/swagger-ui"
 
 .PHONY: generate
 generate: gen-mock gen-swag gen-proto
