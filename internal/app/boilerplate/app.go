@@ -62,7 +62,7 @@ func (a *App) Run() error {
 		return fmt.Errorf("create db client: %w", err)
 	}
 
-	err = migrations.Migrate(dbClient)
+	err = migrations.Migrate(ctx, dbClient)
 	if err != nil {
 		closer.CloseAll()
 		return fmt.Errorf("migrate db: %w", err)

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/Masterminds/squirrel"
 
 	"boilerplate/internal/pkg/clients/db"
@@ -8,6 +10,7 @@ import (
 
 type Repo interface {
 	DbClient() db.Client
+	Transaction(ctx context.Context, fn db.TxFunc) error
 	Users() UsersRepo
 }
 
@@ -26,6 +29,10 @@ func NewRepo(dbClient db.Client) Repo {
 
 func (r *repo) DbClient() db.Client {
 	return r.dbClient
+}
+
+func (r *repo) Transaction(ctx context.Context, fn db.TxFunc) error {
+	return r.dbClient.Transaction(ctx, fn)
 }
 
 func (r *repo) Users() UsersRepo {

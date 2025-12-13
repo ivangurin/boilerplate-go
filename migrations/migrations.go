@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"context"
 	"database/sql"
 	"embed"
 	"fmt"
@@ -12,10 +13,10 @@ import (
 )
 
 //go:embed *.sql
-var embedMigrations embed.FS
+var migrations embed.FS
 
-func Migrate(dbClient db.Client) error {
-	goose.SetBaseFS(embedMigrations)
+func Migrate(ctx context.Context, dbClient db.Client) error {
+	goose.SetBaseFS(migrations)
 
 	err := goose.SetDialect("postgres")
 	if err != nil {
@@ -30,7 +31,7 @@ func Migrate(dbClient db.Client) error {
 		}
 	}()
 
-	err = goose.Up(sqlDB, ".")
+	err = goose.UpContext(ctx, sqlDB, ".")
 	if err != nil {
 		return fmt.Errorf("goose up: %w", err)
 	}

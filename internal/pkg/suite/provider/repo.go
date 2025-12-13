@@ -24,7 +24,7 @@ func (sp *Provider) GetRepo() repository.Repo {
 			panic(err)
 		}
 
-		err = migrations.Migrate(dbClient)
+		err = migrations.Migrate(sp.Context(), dbClient)
 		if err != nil {
 			panic(err)
 		}

@@ -63,13 +63,13 @@ func (r *usersRepo) Create(ctx context.Context, user *User) (int, error) {
 		Values(user.Name, user.Email, user.Password, user.IsAdmin, squirrel.Expr("now()"), squirrel.Expr("now()")).
 		Suffix("RETURNING id")
 
-	query, args, err := builder.ToSql()
+	sql, args, err := builder.ToSql()
 	if err != nil {
 		return 0, fmt.Errorf("to sql: %w", err)
 	}
 
 	var id int
-	err = r.dbClient.QueryRow(ctx, query, args...).Scan(&id)
+	err = r.dbClient.QueryRow(ctx, sql, args...).Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("execute query create user: %w", err)
 	}
@@ -84,12 +84,12 @@ func (r *usersRepo) Get(ctx context.Context, id int) (*User, error) {
 			ColumnID: id,
 		})
 
-	query, args, err := builder.ToSql()
+	sql, args, err := builder.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("to sql: %w", err)
 	}
 
-	rows, err := r.dbClient.Query(ctx, query, args...)
+	rows, err := r.dbClient.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, fmt.Errorf("execute query get user: %w", err)
 	}
@@ -113,12 +113,12 @@ func (r *usersRepo) Update(ctx context.Context, user *User) error {
 			ColumnID: user.ID,
 		})
 
-	query, args, err := builder.ToSql()
+	sql, args, err := builder.ToSql()
 	if err != nil {
 		return fmt.Errorf("to sql: %w", err)
 	}
 
-	_, err = r.dbClient.Exec(ctx, query, args...)
+	_, err = r.dbClient.Exec(ctx, sql, args...)
 	if err != nil {
 		return fmt.Errorf("execute query update user: %w", err)
 	}
@@ -134,12 +134,12 @@ func (r *usersRepo) Delete(ctx context.Context, id int) error {
 			ColumnID: id,
 		})
 
-	query, args, err := builder.ToSql()
+	sql, args, err := builder.ToSql()
 	if err != nil {
 		return fmt.Errorf("to sql: %w", err)
 	}
 
-	_, err = r.dbClient.Exec(ctx, query, args...)
+	_, err = r.dbClient.Exec(ctx, sql, args...)
 	if err != nil {
 		return fmt.Errorf("execute query delete user: %w", err)
 	}
@@ -195,12 +195,12 @@ func (r *usersRepo) Search(ctx context.Context, filter *UserFilter) (*Users, err
 		builder = builder.OrderBy(ColumnID + " ASC")
 	}
 
-	query, args, err := builder.ToSql()
+	sql, args, err := builder.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("to sql: %w", err)
 	}
 
-	rows, err := r.dbClient.Query(ctx, query, args...)
+	rows, err := r.dbClient.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, fmt.Errorf("execute query search users: %w", err)
 	}
