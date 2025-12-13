@@ -3,6 +3,7 @@ package repository_test
 import (
 	"testing"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/require"
 
 	suite_factory "boilerplate/internal/pkg/suite/factory"
@@ -21,6 +22,11 @@ func TestUserCRUD(t *testing.T) {
 	userID, err := sp.GetRepo().Users().Create(sp.Context(), user)
 	require.NoError(t, err)
 	require.NotZero(t, userID)
+
+	unknownUser, err := sp.GetRepo().Users().Get(sp.Context(), -1)
+	require.Error(t, err)
+	require.ErrorIs(t, err, pgx.ErrNoRows)
+	require.Nil(t, unknownUser)
 
 	createdUser, err := sp.GetRepo().Users().Get(sp.Context(), userID)
 	require.NoError(t, err)
