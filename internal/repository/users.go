@@ -40,7 +40,7 @@ type Users struct {
 }
 
 type UsersRepo interface {
-	Create(ctx context.Context, user *User) (int, error)
+	Create(ctx context.Context, user *User) error
 	Get(ctx context.Context, id int) (*User, error)
 	Update(ctx context.Context, user *User) error
 	Delete(ctx context.Context, id int) error
@@ -48,33 +48,41 @@ type UsersRepo interface {
 }
 
 type usersRepo struct {
-	dbClient db.Client
+	client db.Client
 }
 
-func NewUsersRepo(dbClient db.Client) UsersRepo {
+func NewUsersRepo(client db.Client) UsersRepo {
 	return &usersRepo{
-		dbClient: dbClient,
+		client: client,
 	}
 }
 
-func (r *usersRepo) Create(ctx context.Context, user *User) (int, error) {
+func (r *usersRepo) Create(ctx context.Context, user *User) error {
 	builder := sq.Insert(TableUsers).
 		Columns(ColumnName, ColumnEmail, ColumnPassword, ColumnIsAdmin, ColumnCreatedAt, ColumnUpdatedAt).
 		Values(user.Name, user.Email, user.Password, user.IsAdmin, squirrel.Expr("now()"), squirrel.Expr("now()")).
-		Suffix("RETURNING id")
+		Suffix("RETURNING *")
 
 	sql, args, err := builder.ToSql()
 	if err != nil {
-		return 0, fmt.Errorf("to sql: %w", err)
+		return fmt.Errorf("to sql: %w", err)
 	}
 
-	var id int
-	err = r.dbClient.QueryRow(ctx, sql, args...).Scan(&id)
+	rows, err := r.client.Query(ctx, sql, args...)
 	if err != nil {
-		return 0, fmt.Errorf("execute query create user: %w", err)
+		return fmt.Errorf("execute query create user: %w", err)
 	}
 
-	return id, nil
+	defer rows.Close()
+
+	createdUser, err := pgx.CollectOneRow(rows, pgx.RowToAddrOfStructByName[User])
+	if err != nil {
+		return fmt.Errorf("collect user: %w", err)
+	}
+
+	*user = *createdUser
+
+	return nil
 }
 
 func (r *usersRepo) Get(ctx context.Context, id int) (*User, error) {
@@ -89,7 +97,7 @@ func (r *usersRepo) Get(ctx context.Context, id int) (*User, error) {
 		return nil, fmt.Errorf("to sql: %w", err)
 	}
 
-	rows, err := r.dbClient.Query(ctx, sql, args...)
+	rows, err := r.client.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, fmt.Errorf("execute query get user: %w", err)
 	}
@@ -118,7 +126,7 @@ func (r *usersRepo) Update(ctx context.Context, user *User) error {
 		return fmt.Errorf("to sql: %w", err)
 	}
 
-	_, err = r.dbClient.Exec(ctx, sql, args...)
+	_, err = r.client.Exec(ctx, sql, args...)
 	if err != nil {
 		return fmt.Errorf("execute query update user: %w", err)
 	}
@@ -139,7 +147,7 @@ func (r *usersRepo) Delete(ctx context.Context, id int) error {
 		return fmt.Errorf("to sql: %w", err)
 	}
 
-	_, err = r.dbClient.Exec(ctx, sql, args...)
+	_, err = r.client.Exec(ctx, sql, args...)
 	if err != nil {
 		return fmt.Errorf("execute query delete user: %w", err)
 	}
@@ -200,7 +208,7 @@ func (r *usersRepo) Search(ctx context.Context, filter *UserFilter) (*Users, err
 		return nil, fmt.Errorf("to sql: %w", err)
 	}
 
-	rows, err := r.dbClient.Query(ctx, sql, args...)
+	rows, err := r.client.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, fmt.Errorf("execute query search users: %w", err)
 	}

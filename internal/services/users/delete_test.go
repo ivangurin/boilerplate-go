@@ -16,13 +16,13 @@ func TestDeleteUser(t *testing.T) {
 	defer cleanup()
 
 	user := suite_factory.NewUserFactory().Build()
-	userID, err := sp.GetRepo().Users().Create(sp.Context(), user)
+	err := sp.GetRepo().Users().Create(sp.Context(), user)
 	require.NoError(t, err)
 
-	err = sp.GetUserService().Delete(sp.Context(), userID)
+	err = sp.GetUserService().Delete(sp.Context(), user.ID)
 	require.NoError(t, err)
 
-	deletedUser, err := sp.GetUserService().Get(sp.Context(), userID)
+	deletedUser, err := sp.GetUserService().Get(sp.Context(), user.ID)
 	require.NoError(t, err)
 	require.NotNil(t, deletedUser)
 	require.True(t, deletedUser.Deleted)

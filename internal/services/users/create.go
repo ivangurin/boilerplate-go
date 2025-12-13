@@ -45,12 +45,12 @@ func (s *service) Create(ctx context.Context, req *UserCreateRequest) (*User, er
 		}
 	}
 
-	id, err := s.repo.Users().Create(ctx, user)
+	err = s.repo.Users().Create(ctx, user)
 	if err != nil {
 		return nil, fmt.Errorf("create user: %w", err)
 	}
 
-	user, err = s.repo.Users().Get(ctx, id)
+	user, err = s.repo.Users().Get(ctx, user.ID)
 	if err != nil {
 		return nil, fmt.Errorf("get created user: %w", err)
 	}

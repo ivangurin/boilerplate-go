@@ -9,7 +9,7 @@ import (
 )
 
 type Repo interface {
-	DbClient() db.Client
+	Client() db.Client
 	Transaction(ctx context.Context, fn db.TxFunc) error
 	Users() UsersRepo
 }
@@ -27,7 +27,7 @@ func NewRepo(dbClient db.Client) Repo {
 	}
 }
 
-func (r *repo) DbClient() db.Client {
+func (r *repo) Client() db.Client {
 	return r.dbClient
 }
 

@@ -31,17 +31,17 @@ func TestMe_CorrectUser(t *testing.T) {
 	t.Cleanup(cleaner)
 
 	user := suite_factory.NewUserFactory().Build()
-	userID, err := sp.GetRepo().Users().Create(sp.Context(), user)
+	err := sp.GetRepo().Users().Create(sp.Context(), user)
 	require.NoError(t, err)
 
 	rw := httptest.NewRecorder()
 	gCtx, _ := gin.CreateTestContext(rw)
-	gin_pkg.SetUserID(gCtx, userID)
+	gin_pkg.SetUserID(gCtx, user.ID)
 
 	res, err := sp.GetAuthService().Me(gCtx)
 	require.NoError(t, err)
 	require.NotNil(t, res)
-	require.Equal(t, userID, res.ID)
+	require.Equal(t, user.ID, res.ID)
 	require.Equal(t, user.Name, res.Name)
 	require.Equal(t, user.Email, res.Email)
 }

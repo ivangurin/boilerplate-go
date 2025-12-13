@@ -14,6 +14,13 @@ func NewUserFactory() *UserFactory {
 	return &UserFactory{}
 }
 
+func (f *UserFactory) WithID(id int) *UserFactory {
+	f.setters = append(f.setters, func(user *repository.User) {
+		user.ID = id
+	})
+	return f
+}
+
 func (f *UserFactory) WithAdmin() *UserFactory {
 	f.setters = append(f.setters, func(user *repository.User) {
 		user.IsAdmin = true

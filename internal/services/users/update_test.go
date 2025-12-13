@@ -19,13 +19,13 @@ func TestUpdateUser(t *testing.T) {
 	defer cleanup()
 
 	user := suite_factory.NewUserFactory().Build()
-	userID, err := sp.GetRepo().Users().Create(sp.Context(), user)
+	err := sp.GetRepo().Users().Create(sp.Context(), user)
 	require.NoError(t, err)
 
-	user = suite_factory.NewUserFactory().WithPassword(gofakeit.Word()).Build()
+	user = suite_factory.NewUserFactory().WithID(user.ID).WithPassword(gofakeit.Word()).Build()
 
 	updatedUser, err := sp.GetUserService().Update(sp.Context(), &users.UserUpdateRequest{
-		ID:       userID,
+		ID:       user.ID,
 		Name:     &user.Name,
 		Email:    &user.Email,
 		Password: &user.Password,

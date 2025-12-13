@@ -18,20 +18,22 @@ func TestUserCRUD(t *testing.T) {
 	sp, cleanup := suite_provider.NewProvider()
 	defer cleanup()
 
-	user := suite_factory.NewUserFactory().Build()
-	userID, err := sp.GetRepo().Users().Create(sp.Context(), user)
-	require.NoError(t, err)
-	require.NotZero(t, userID)
-
 	unknownUser, err := sp.GetRepo().Users().Get(sp.Context(), -1)
 	require.Error(t, err)
 	require.ErrorIs(t, err, pgx.ErrNoRows)
 	require.Nil(t, unknownUser)
 
-	createdUser, err := sp.GetRepo().Users().Get(sp.Context(), userID)
+	user := suite_factory.NewUserFactory().Build()
+	err = sp.GetRepo().Users().Create(sp.Context(), user)
+	require.NoError(t, err)
+	require.NotZero(t, user.ID)
+	require.NotEmpty(t, user.CreatedAt)
+	require.NotEmpty(t, user.UpdatedAt)
+
+	createdUser, err := sp.GetRepo().Users().Get(sp.Context(), user.ID)
 	require.NoError(t, err)
 	require.NotNil(t, createdUser)
-	require.Equal(t, userID, createdUser.ID)
+	require.Equal(t, user.ID, createdUser.ID)
 	require.Equal(t, user.Name, createdUser.Name)
 	require.Equal(t, user.Email, createdUser.Email)
 	require.Equal(t, user.Password, createdUser.Password)
@@ -40,12 +42,11 @@ func TestUserCRUD(t *testing.T) {
 	require.NotEmpty(t, createdUser.CreatedAt)
 	require.NotEmpty(t, createdUser.UpdatedAt)
 
-	user = suite_factory.NewUserFactory().Build()
-	user.ID = userID
+	user = suite_factory.NewUserFactory().WithID(user.ID).Build()
 	err = sp.GetRepo().Users().Update(sp.Context(), user)
 	require.NoError(t, err)
 
-	updatedUser, err := sp.GetRepo().Users().Get(sp.Context(), userID)
+	updatedUser, err := sp.GetRepo().Users().Get(sp.Context(), user.ID)
 	require.NoError(t, err)
 	require.NotNil(t, updatedUser)
 	require.Equal(t, user.Name, updatedUser.Name)
@@ -56,10 +57,10 @@ func TestUserCRUD(t *testing.T) {
 	require.NotEmpty(t, updatedUser.CreatedAt)
 	require.NotEmpty(t, updatedUser.UpdatedAt)
 
-	err = sp.GetRepo().Users().Delete(sp.Context(), userID)
+	err = sp.GetRepo().Users().Delete(sp.Context(), user.ID)
 	require.NoError(t, err)
 
-	deletedUser, err := sp.GetRepo().Users().Get(sp.Context(), userID)
+	deletedUser, err := sp.GetRepo().Users().Get(sp.Context(), user.ID)
 	require.NoError(t, err)
 	require.NotNil(t, deletedUser)
 	require.True(t, deletedUser.Deleted)
@@ -75,9 +76,8 @@ func TestUserSearch(t *testing.T) {
 	users := suite_factory.NewUserFactory().Builds(4)
 	users[0].IsAdmin = true
 	for _, user := range users {
-		userID, err := sp.GetRepo().Users().Create(sp.Context(), user)
+		err := sp.GetRepo().Users().Create(sp.Context(), user)
 		require.NoError(t, err)
-		user.ID = userID
 	}
 
 	err := sp.GetRepo().Users().Delete(sp.Context(), users[3].ID)

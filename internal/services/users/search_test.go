@@ -20,9 +20,8 @@ func TestSearchUsers(t *testing.T) {
 	users := suite_factory.NewUserFactory().Builds(4)
 	users[0].IsAdmin = true
 	for _, user := range users {
-		userID, err := sp.GetRepo().Users().Create(sp.Context(), user)
+		err := sp.GetRepo().Users().Create(sp.Context(), user)
 		require.NoError(t, err)
-		user.ID = userID
 	}
 
 	err := sp.GetRepo().Users().Delete(sp.Context(), users[3].ID)

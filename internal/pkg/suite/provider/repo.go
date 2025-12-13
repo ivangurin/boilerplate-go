@@ -77,7 +77,7 @@ func (sp *Provider) ClearDB() {
 		panic(err)
 	}
 
-	rows, err := sp.repo.DbClient().Query(sp.Context(), sql, args...)
+	rows, err := sp.repo.Client().Query(sp.Context(), sql, args...)
 	if err != nil {
 		panic(err)
 	}
@@ -93,7 +93,7 @@ func (sp *Provider) ClearDB() {
 		tableNames[i] = table.Name
 	}
 
-	_, err = sp.repo.DbClient().Exec(sp.Context(), fmt.Sprintf("TRUNCATE TABLE %s RESTART IDENTITY CASCADE", strings.Join(tableNames, ", ")))
+	_, err = sp.repo.Client().Exec(sp.Context(), fmt.Sprintf("TRUNCATE TABLE %s RESTART IDENTITY CASCADE", strings.Join(tableNames, ", ")))
 	if err != nil {
 		panic(err)
 	}
