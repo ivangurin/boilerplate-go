@@ -6,9 +6,9 @@ import (
 	"sync"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5"
 
 	"boilerplate/internal/pkg/clients/db"
-	"boilerplate/internal/pkg/easyscan"
 	"boilerplate/internal/repository"
 	"boilerplate/migrations"
 )
@@ -77,8 +77,13 @@ func (sp *Provider) ClearDB() {
 		panic(err)
 	}
 
-	tables := []Table{}
-	err = easyscan.Select(sp.Context(), sp.repo.DbClient(), &tables, sql, args...)
+	rows, err := sp.repo.DbClient().Query(sp.Context(), sql, args...)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	tables, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Table])
 	if err != nil {
 		panic(err)
 	}

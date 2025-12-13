@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5"
 
 	"boilerplate/internal/pkg/clients/db"
-	"boilerplate/internal/pkg/easyscan"
 )
 
 type User struct {
@@ -60,7 +60,7 @@ func NewUsersRepo(dbClient db.Client) UsersRepo {
 func (r *usersRepo) Create(ctx context.Context, user *User) (int, error) {
 	builder := sq.Insert(TableUsers).
 		Columns(ColumnName, ColumnEmail, ColumnPassword, ColumnIsAdmin, ColumnCreatedAt, ColumnUpdatedAt).
-		Values(user.Name, user.Email, user.Password, user.IsAdmin, "now()", "now()").
+		Values(user.Name, user.Email, user.Password, user.IsAdmin, squirrel.Expr("now()"), squirrel.Expr("now()")).
 		Suffix("RETURNING id")
 
 	query, args, err := builder.ToSql()
@@ -89,10 +89,15 @@ func (r *usersRepo) Get(ctx context.Context, id int) (*User, error) {
 		return nil, fmt.Errorf("to sql: %w", err)
 	}
 
-	user := &User{}
-	err = easyscan.Get(ctx, r.dbClient, user, query, args...)
+	rows, err := r.dbClient.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("execute query get user: %w", err)
+	}
+	defer rows.Close()
+
+	user, err := pgx.CollectOneRow(rows, pgx.RowToAddrOfStructByName[User])
+	if err != nil {
+		return nil, fmt.Errorf("collect user: %w", err)
 	}
 
 	return user, nil
@@ -103,7 +108,7 @@ func (r *usersRepo) Update(ctx context.Context, user *User) error {
 		Set(ColumnName, user.Name).
 		Set(ColumnEmail, user.Email).
 		Set(ColumnPassword, user.Password).
-		Set(ColumnUpdatedAt, "now()").
+		Set(ColumnUpdatedAt, squirrel.Expr("now()")).
 		Where(squirrel.Eq{
 			ColumnID: user.ID,
 		})
@@ -124,7 +129,7 @@ func (r *usersRepo) Update(ctx context.Context, user *User) error {
 func (r *usersRepo) Delete(ctx context.Context, id int) error {
 	builder := sq.Update(TableUsers).
 		Set(ColumnDeleted, true).
-		Set(ColumnDeletedAt, "now()").
+		Set(ColumnDeletedAt, squirrel.Expr("now()")).
 		Where(squirrel.Eq{
 			ColumnID: id,
 		})
@@ -195,10 +200,16 @@ func (r *usersRepo) Search(ctx context.Context, filter *UserFilter) (*Users, err
 		return nil, fmt.Errorf("to sql: %w", err)
 	}
 
-	users := &Users{}
-	err = easyscan.Select(ctx, r.dbClient, &users.Result, query, args...)
+	rows, err := r.dbClient.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("execute query search users: %w", err)
+	}
+	defer rows.Close()
+
+	users := &Users{}
+	users.Result, err = pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[User])
+	if err != nil {
+		return nil, fmt.Errorf("collect user: %w", err)
 	}
 
 	return users, nil
