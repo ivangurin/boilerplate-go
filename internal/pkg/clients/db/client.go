@@ -3,11 +3,14 @@ package db
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+const maxConns = 20
 
 type Client interface {
 	GetPool() *pgxpool.Pool
@@ -24,10 +27,21 @@ type client struct {
 }
 
 func New(ctx context.Context, dsn string) (Client, error) {
-	p, err := pgxpool.New(ctx, dsn)
+	config, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		return nil, fmt.Errorf("db parse config: %w", err)
+	}
+
+	config.MaxConns = maxConns
+	config.MaxConnLifetime = 30 * time.Minute
+	config.MaxConnIdleTime = 5 * time.Minute
+	config.HealthCheckPeriod = 1 * time.Minute
+
+	p, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("create db pool: %w", err)
 	}
+
 	err = p.Ping(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("ping db: %w", err)
