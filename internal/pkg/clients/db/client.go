@@ -82,31 +82,55 @@ func (c *client) Close() error {
 }
 
 func (c *client) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
+	var (
+		res pgconn.CommandTag
+		err error
+	)
+
 	now := time.Now().UTC()
 	c.logger.DebugKV(ctx, "start execution", "started at", now.Format(time.RFC3339Nano), "sql", sql, "args", fmt.Sprintf("%+v", args))
 	defer func() {
-		c.logger.DebugKV(ctx, "end execution", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String())
+		if err == nil {
+			c.logger.DebugKV(ctx, "end execution", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String())
+			return
+		}
+		c.logger.DebugKV(ctx, "end execution", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String(), "error", err.Error())
 	}()
 
 	tx, exists := ctx.Value(txKey{}).(pgx.Tx)
 	if exists {
-		return tx.Exec(ctx, sql, args...)
+		res, err = tx.Exec(ctx, sql, args...)
+	} else {
+		res, err = c.pool.Exec(ctx, sql, args...)
 	}
-	return c.pool.Exec(ctx, sql, args...)
+
+	return res, err
 }
 
 func (c *client) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
+	var (
+		res pgx.Rows
+		err error
+	)
+
 	now := time.Now().UTC()
 	c.logger.DebugKV(ctx, "start query", "started at", now.Format(time.RFC3339Nano), "sql", sql, "args", fmt.Sprintf("%+v", args))
 	defer func() {
-		c.logger.DebugKV(ctx, "end query", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String())
+		if err == nil {
+			c.logger.DebugKV(ctx, "end query", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String())
+			return
+		}
+		c.logger.DebugKV(ctx, "end query", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String(), "error", err.Error())
 	}()
 
 	tx, exists := ctx.Value(txKey{}).(pgx.Tx)
 	if exists {
-		return tx.Query(ctx, sql, args...)
+		res, err = tx.Query(ctx, sql, args...)
+	} else {
+		res, err = c.pool.Query(ctx, sql, args...)
 	}
-	return c.pool.Query(ctx, sql, args...)
+
+	return res, err
 }
 
 func (c *client) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
@@ -124,19 +148,27 @@ func (c *client) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row 
 }
 
 func (c *client) Transaction(ctx context.Context, fn TxFunc) error {
+	var err error
+
 	now := time.Now().UTC()
 	c.logger.DebugKV(ctx, "start transaction", "started at", now.Format(time.RFC3339Nano))
 	defer func() {
-		c.logger.DebugKV(ctx, "end transaction", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String())
+		if err == nil {
+			c.logger.DebugKV(ctx, "end transaction", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String())
+			return
+		}
+		c.logger.DebugKV(ctx, "end transaction", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String(), "error", err.Error())
 	}()
 
-	conn, err := c.pool.Acquire(ctx)
+	var conn *pgxpool.Conn
+	conn, err = c.pool.Acquire(ctx)
 	if err != nil {
 		return fmt.Errorf("get connection from pool: %w", err)
 	}
 	defer conn.Release()
 
-	tx, err := conn.Begin(ctx)
+	var tx pgx.Tx
+	tx, err = conn.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("begin transaction: %w", err)
 	}
