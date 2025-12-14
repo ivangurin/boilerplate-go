@@ -19,7 +19,7 @@ func (sp *Provider) GetRepo() repository.Repo {
 	if sp.repo == nil {
 		muRepo.Lock()
 
-		dbClient, err := db.New(sp.ctx, sp.config.DB.GetDSN())
+		dbClient, err := db.New(sp.ctx, sp.logger, sp.config.DB.GetDSN())
 		if err != nil {
 			panic(err)
 		}

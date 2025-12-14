@@ -22,10 +22,10 @@ const (
 
 func main() {
 	versionInfo := version.Get()
-	log.Println("Git version:", versionInfo.GitVersion)
 	log.Println("Build date:", versionInfo.BuildDate)
-	log.Println("Git commit:", versionInfo.GitCommit)
 	log.Println("Platform:", versionInfo.Platform)
+	log.Println("Git version:", versionInfo.GitVersion)
+	log.Println("Git commit:", versionInfo.GitCommit)
 	fmt.Println()
 
 	viper.SetEnvPrefix(envPrefix)

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"boilerplate/internal/pkg/logger"
 	"context"
 	"fmt"
 	"time"
@@ -36,10 +37,11 @@ type Executor interface {
 }
 
 type client struct {
-	pool *pgxpool.Pool
+	logger logger.Logger
+	pool   *pgxpool.Pool
 }
 
-func New(ctx context.Context, dsn string) (Client, error) {
+func New(ctx context.Context, logger logger.Logger, dsn string) (Client, error) {
 	config, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("db parse config: %w", err)
@@ -61,49 +63,66 @@ func New(ctx context.Context, dsn string) (Client, error) {
 	}
 
 	return &client{
-		pool: p,
+		logger: logger,
+		pool:   p,
 	}, nil
 }
 
-func (p *client) GetPool() *pgxpool.Pool {
-	return p.pool
+func (c *client) GetPool() *pgxpool.Pool {
+	return c.pool
 }
 
-func (p *client) Ping(ctx context.Context) error {
-	return p.pool.Ping(ctx)
+func (c *client) Ping(ctx context.Context) error {
+	return c.pool.Ping(ctx)
 }
 
-func (p *client) Close() error {
-	p.pool.Close()
+func (c *client) Close() error {
+	c.pool.Close()
 	return nil
 }
 
-func (p *client) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
+func (c *client) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
+	now := time.Now().UTC()
+	c.logger.DebugKV(ctx, "start execution", "started at", now.Format(time.RFC3339Nano), "sql", sql, "args", fmt.Sprintf("%+v", args))
+	defer c.logger.DebugKV(ctx, "end execution", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", fmt.Sprint(time.Since(now)))
+
 	tx, exists := ctx.Value(txKey{}).(pgx.Tx)
 	if exists {
 		return tx.Exec(ctx, sql, args...)
 	}
-	return p.pool.Exec(ctx, sql, args...)
+	return c.pool.Exec(ctx, sql, args...)
 }
 
-func (p *client) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
+func (c *client) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
+	now := time.Now().UTC()
+	c.logger.DebugKV(ctx, "start query", "started at", now.Format(time.RFC3339Nano), "sql", sql, "args", fmt.Sprintf("%+v", args))
+	defer c.logger.DebugKV(ctx, "end query", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", fmt.Sprint(time.Since(now)))
+
 	tx, exists := ctx.Value(txKey{}).(pgx.Tx)
 	if exists {
 		return tx.Query(ctx, sql, args...)
 	}
-	return p.pool.Query(ctx, sql, args...)
+	return c.pool.Query(ctx, sql, args...)
 }
 
-func (p *client) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
+func (c *client) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
+	now := time.Now().UTC()
+	c.logger.DebugKV(ctx, "start query row", "started at", now.Format(time.RFC3339Nano), "sql", sql, "args", fmt.Sprintf("%+v", args))
+	defer c.logger.DebugKV(ctx, "end query row", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", fmt.Sprint(time.Since(now)))
+
 	tx, exists := ctx.Value(txKey{}).(pgx.Tx)
 	if exists {
 		return tx.QueryRow(ctx, sql, args...)
 	}
-	return p.pool.QueryRow(ctx, sql, args...)
+	return c.pool.QueryRow(ctx, sql, args...)
 }
 
-func (p *client) Transaction(ctx context.Context, fn TxFunc) error {
-	conn, err := p.pool.Acquire(ctx)
+func (c *client) Transaction(ctx context.Context, fn TxFunc) error {
+	now := time.Now().UTC()
+	c.logger.DebugKV(ctx, "start transaction", "started at", now.Format(time.RFC3339Nano))
+	defer c.logger.DebugKV(ctx, "end transaction", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", fmt.Sprint(time.Since(now)))
+
+	conn, err := c.pool.Acquire(ctx)
 	if err != nil {
 		return fmt.Errorf("get connection from pool: %w", err)
 	}

@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"boilerplate/internal/pkg/metadata"
 	"context"
 	"errors"
 	"fmt"
@@ -11,8 +12,10 @@ import (
 )
 
 const (
-	fieldTraceID = "trace_id"
-	fieldSpanID  = "span_id"
+	fieldTraceID   = "trace_id"
+	fieldSpanID    = "span_id"
+	fieldRequestID = "request_id"
+	fieldIP        = "ip"
 )
 
 type Logger interface {
@@ -153,6 +156,16 @@ func (l *logger) getFields(ctx context.Context, values []string) []zap.Field {
 	spanID := l.getSpanID(ctx)
 	if spanID != "" {
 		fields = append(fields, zap.String(fieldSpanID, spanID))
+	}
+
+	requestID, exist := metadata.GetRequestID(ctx)
+	if exist {
+		fields = append(fields, zap.String(fieldRequestID, requestID))
+	}
+
+	ip, exist := metadata.GetIP(ctx)
+	if exist {
+		fields = append(fields, zap.String(fieldIP, ip))
 	}
 
 	return fields

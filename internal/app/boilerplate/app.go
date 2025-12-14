@@ -56,7 +56,7 @@ func (a *App) Run() error {
 	closer.Add(logger.Close)
 
 	// DB Client
-	dbClient, err := db.New(ctx, a.config.DB.GetDSN())
+	dbClient, err := db.New(ctx, logger, a.config.DB.GetDSN())
 	if err != nil {
 		closer.CloseAll()
 		return fmt.Errorf("create db client: %w", err)
