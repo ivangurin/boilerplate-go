@@ -84,7 +84,9 @@ func (c *client) Close() error {
 func (c *client) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
 	now := time.Now().UTC()
 	c.logger.DebugKV(ctx, "start execution", "started at", now.Format(time.RFC3339Nano), "sql", sql, "args", fmt.Sprintf("%+v", args))
-	defer c.logger.DebugKV(ctx, "end execution", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", fmt.Sprint(time.Since(now)))
+	defer func() {
+		c.logger.DebugKV(ctx, "end execution", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String())
+	}()
 
 	tx, exists := ctx.Value(txKey{}).(pgx.Tx)
 	if exists {
@@ -96,7 +98,9 @@ func (c *client) Exec(ctx context.Context, sql string, args ...any) (pgconn.Comm
 func (c *client) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
 	now := time.Now().UTC()
 	c.logger.DebugKV(ctx, "start query", "started at", now.Format(time.RFC3339Nano), "sql", sql, "args", fmt.Sprintf("%+v", args))
-	defer c.logger.DebugKV(ctx, "end query", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", fmt.Sprint(time.Since(now)))
+	defer func() {
+		c.logger.DebugKV(ctx, "end query", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String())
+	}()
 
 	tx, exists := ctx.Value(txKey{}).(pgx.Tx)
 	if exists {
@@ -108,7 +112,9 @@ func (c *client) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, 
 func (c *client) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
 	now := time.Now().UTC()
 	c.logger.DebugKV(ctx, "start query row", "started at", now.Format(time.RFC3339Nano), "sql", sql, "args", fmt.Sprintf("%+v", args))
-	defer c.logger.DebugKV(ctx, "end query row", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", fmt.Sprint(time.Since(now)))
+	defer func() {
+		c.logger.DebugKV(ctx, "end query row", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String())
+	}()
 
 	tx, exists := ctx.Value(txKey{}).(pgx.Tx)
 	if exists {
@@ -120,7 +126,9 @@ func (c *client) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row 
 func (c *client) Transaction(ctx context.Context, fn TxFunc) error {
 	now := time.Now().UTC()
 	c.logger.DebugKV(ctx, "start transaction", "started at", now.Format(time.RFC3339Nano))
-	defer c.logger.DebugKV(ctx, "end transaction", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", fmt.Sprint(time.Since(now)))
+	defer func() {
+		c.logger.DebugKV(ctx, "end transaction", "ended at", time.Now().UTC().Format(time.RFC3339Nano), "duration", time.Since(now).String())
+	}()
 
 	conn, err := c.pool.Acquire(ctx)
 	if err != nil {
