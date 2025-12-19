@@ -2,13 +2,12 @@ package middleware
 
 import (
 	"context"
-	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	grpc_pkg "boilerplate/internal/pkg/grpc"
 	metadata_pkg "boilerplate/internal/pkg/metadata"
 	"boilerplate/internal/services/auth"
 )
@@ -29,26 +28,17 @@ func (m *middleware) Auth(ctx context.Context, req any, info *grpc.UnaryServerIn
 		return handler(ctx, req)
 	}
 
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, errUnauthenticated
-	}
-
-	// Получаем токен из заголовка authorization
-	var token string
-	values := md.Get("authorization")
-	if len(values) > 0 {
-		token = strings.TrimPrefix(values[0], "Bearer ")
-		token = strings.TrimSpace(token)
-	}
-
-	if token == "" {
+	// Получаем токены
+	accessToken, _ := grpc_pkg.GetAccessToken(ctx)
+	refreshToken, _ := grpc_pkg.GetRefreshToken(ctx)
+	if accessToken == "" && refreshToken == "" {
 		return nil, errUnauthenticated
 	}
 
 	// Валидируем токен
 	authResp, err := m.authService.Validate(ctx, &auth.AuthValidateRequest{
-		AccessToken: &token,
+		AccessToken:  &accessToken,
+		RefreshToken: &refreshToken,
 	})
 	if err != nil {
 		return nil, errUnauthenticated
@@ -61,6 +51,18 @@ func (m *middleware) Auth(ctx context.Context, req any, info *grpc.UnaryServerIn
 
 	if authResp.UserName != nil {
 		ctx = metadata_pkg.SetUserName(ctx, *authResp.UserName)
+	}
+
+	if authResp.AccessToken != nil {
+		if err := grpc_pkg.SetAccessToken(ctx, *authResp.AccessToken, m.authService.GetConfig().AccessTokenTTL); err != nil {
+			return nil, err
+		}
+	}
+
+	if authResp.RefreshToken != nil {
+		if err := grpc_pkg.SetRefreshToken(ctx, *authResp.RefreshToken, m.authService.GetConfig().RefreshTokenTTL); err != nil {
+			return nil, err
+		}
 	}
 
 	return handler(ctx, req)

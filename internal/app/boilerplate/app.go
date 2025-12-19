@@ -3,10 +3,10 @@ package boilerplate
 import (
 	"context"
 	"fmt"
-	"net"
-	"net/http"
 	"os"
 	"syscall"
+
+	"google.golang.org/grpc"
 
 	grpc_handlers "boilerplate/internal/api/grpc/handlers"
 	grpc_middleware "boilerplate/internal/api/grpc/middleware"
@@ -14,17 +14,13 @@ import (
 	"boilerplate/internal/model"
 	"boilerplate/internal/pkg/clients/db"
 	closer_pkg "boilerplate/internal/pkg/closer"
+	"boilerplate/internal/pkg/gateway"
 	"boilerplate/internal/pkg/grpc_server"
 	"boilerplate/internal/pkg/http_server"
 	logger_pkg "boilerplate/internal/pkg/logger"
-	"boilerplate/internal/pkg/swagger"
 	"boilerplate/internal/repository"
 	"boilerplate/internal/service_provider"
 	"boilerplate/migrations"
-
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type App struct {
@@ -130,8 +126,7 @@ func (a *App) Run() error {
 		return nil
 	})
 
-	// HTTP Gateway Server
-	httpRouter, err := a.setupHTTPGateway(ctx, grpcHandlers)
+	httpRouter, err := gateway.Setup(ctx, a.config.API, grpcHandlers)
 	if err != nil {
 		closer.CloseAll()
 		return fmt.Errorf("setup http gateway: %w", err)
@@ -158,34 +153,4 @@ func (a *App) Run() error {
 	logger.Info(ctx, "App is running...")
 
 	return nil
-}
-
-func (a *App) setupHTTPGateway(ctx context.Context, grpcHandlers []model.GRPCHandler) (*http.ServeMux, error) {
-	// Create gRPC client connection
-	grpcConn, err := grpc.NewClient(
-		net.JoinHostPort(a.config.API.Host, a.config.API.GRPCPort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("create grpc client: %w", err)
-	}
-
-	// Setup main router
-	router := http.NewServeMux()
-
-	// Register swagger UI
-	swagger.Register(router)
-
-	// Setup gRPC gateway
-	gwRouter := runtime.NewServeMux()
-	for _, handler := range grpcHandlers {
-		if err := handler.RegisterHTTPHandler(ctx, gwRouter, grpcConn); err != nil {
-			return nil, fmt.Errorf("register grpc handler: %w", err)
-		}
-	}
-
-	// Mount gateway to main router
-	router.Handle("/", gwRouter)
-
-	return router, nil
 }
