@@ -1,11 +1,16 @@
 package suite_provider
 
 import (
+	"context"
 	"fmt"
+	"path"
+	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/flock"
 	"github.com/jackc/pgx/v5"
 
 	"boilerplate/internal/pkg/clients/db"
@@ -13,11 +18,14 @@ import (
 	"boilerplate/migrations"
 )
 
-var muRepo sync.Mutex
+const dbLockPath = "/db.lock"
+
+var dbLockFile *flock.Flock
+var initOnce sync.Once
 
 func (sp *Provider) GetRepo() repository.Repo {
 	if sp.repo == nil {
-		muRepo.Lock()
+		lockDB(sp.Context())
 
 		dbClient, err := db.New(sp.ctx, sp.logger, sp.config.DB.GetDSN())
 		if err != nil {
@@ -35,7 +43,7 @@ func (sp *Provider) GetRepo() repository.Repo {
 
 		sp.cleanups = append(sp.cleanups,
 			func() error {
-				defer muRepo.Unlock()
+				defer unlockDB()
 				// sp.ClearDB()
 				sp.repo = nil
 				return nil
@@ -97,4 +105,37 @@ func (sp *Provider) ClearDB() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func lockDB(ctx context.Context) {
+	initFlock()
+
+	lockCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+
+	locked, err := dbLockFile.TryLockContext(lockCtx, time.Millisecond*5)
+	if err != nil {
+		panic(err)
+	}
+	if !locked {
+		panic("lockDb can't take a lock")
+	}
+}
+
+func unlockDB() {
+	err := dbLockFile.Unlock()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func initFlock() {
+	initOnce.Do(func() {
+		dbLockFile = flock.New(getLocalDirPath() + dbLockPath)
+	})
+}
+
+func getLocalDirPath() string {
+	_, f, _, _ := runtime.Caller(0)
+	return path.Dir(f)
 }
