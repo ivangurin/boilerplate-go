@@ -25,7 +25,8 @@ build:
 
 .PHONY: lint
 lint: 
-	go tool golangci-lint run \
+	@echo "\033[32m▶\033[0m Running linters on changed files..."
+	@go tool golangci-lint run \
 	--new-from-rev=master \
 	--config=.golangci.yaml \
 	--max-issues-per-linter=1000 \
@@ -34,7 +35,8 @@ lint:
 
 .PHONY: lint-full
 lint-full: 
-	go tool golangci-lint run \
+	@echo "\033[32m▶\033[0m Running linters on full codebase..."
+	@go tool golangci-lint run \
 	--config=.golangci.yaml \
 	--max-issues-per-linter=1000 \
 	--max-same-issues=1000 \
@@ -42,15 +44,16 @@ lint-full:
 
 .PHONY: prepare-test
 prepare-test:
+	@echo "\033[32m▶\033[0m Preparing test database..."
 	@if [ -z "$$GITLAB_CI" ]; then \
-		echo "Preparing test database locally"; \
 		docker exec boilerplate-go-postgres-1 dropdb --if-exists -Upostgres $(TEST_DB_NAME); \
 		docker exec boilerplate-go-postgres-1 createdb -Upostgres $(TEST_DB_NAME); \
 	fi
 
 .PHONY: test
 test: prepare-test
-	go test -v -count=1 ./... -coverprofile coverage.out.tmp 
+	@echo "\033[32m▶\033[0m Running tests with coverage..."
+	@go test -v -count=1 ./... -coverprofile coverage.out.tmp 
 	@grep -vE "mock.go|pb.go" coverage.out.tmp > coverage.out
 	@rm -f coverage.out.tmp
 	@go tool cover -func coverage.out | grep total | awk '{print "Coverage percent: " $$3}'
@@ -58,23 +61,26 @@ test: prepare-test
 
 .PHONY: gen-mock
 gen-mock: 
-	go tool mockery
+	@echo "\033[32m▶\033[0m Generating mocks..."
+	@go tool mockery
 
 .PHONY: gen-swag
 gen-swag:
-	go tool swag fmt	
-	go tool swag init --parseDependency --parseInternal -g handlers.go -d internal/api/handlers -o internal/api/swagger
+	@echo "\033[32m▶\033[0m Generating swagger docs..."
+	@go tool swag fmt	
+	@go tool swag init --parseDependency --parseInternal -g handlers.go -d internal/api/handlers -o internal/api/swagger
 
 .PHONY: proto-deps
 proto-deps:
-	@echo "Exporting proto dependencies for IDE..."
+	@echo "\033[32m▶\033[0m Exporting proto dependencies for IDE..."
 	@rm -rf .proto-deps
 	@go tool buf export buf.build/envoyproxy/protoc-gen-validate --output .proto-deps
 	@go tool buf export buf.build/googleapis/googleapis --output .proto-deps
 	@go tool buf export buf.build/grpc-ecosystem/grpc-gateway --output .proto-deps
-	@echo "Proto dependencies exported to .proto-deps/"
+	@echo "\033[32m▶\033[0m Proto dependencies exported to .proto-deps/"
 
 .install-proto-plugins:
+	@echo "\033[32m▶\033[0m Installing proto plugins..."
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	GOBIN=$(LOCAL_BIN) go install github.com/envoyproxy/protoc-gen-validate@latest
@@ -83,20 +89,23 @@ proto-deps:
 
 .PHONY: gen-proto
 gen-proto: .install-proto-plugins
-	@echo "Updating buf dependencies..."
+	@echo "\033[32m▶\033[0m Updating buf dependencies..."
 	@go tool buf dep update
-	@echo "Generating proto files..."
+	@echo "\033[32m▶\033[0m Generating proto files..."
 	@PATH=$(LOCAL_BIN):"$(PATH)" go tool buf generate
-	@echo "Merging swagger files..."
+	@echo "\033[32m▶\033[0m Merging swagger files..."
 	@go tool swagger mixin --quiet --ignore-conflicts --compact -o internal/pkg/swagger/swagger.json pkg/pb/*.swagger.json
-	@echo "Proto generation completed successfully"
+	@find pkg/pb -name "*.swagger.json" -type f -delete
+	@echo "\033[32m▶\033[0m Proto generation completed successfully"
 	
 .PHONY: lint-proto
 lint-proto:
-	go tool buf lint
+	@echo "\033[32m▶\033[0m Linting proto files..."
+	@go tool buf lint
 
 .PHONY: generate
 generate: gen-mock gen-swag gen-proto
+	@echo "\033[32m▶\033[0m Code generation completed successfully"
 
 .PHONY: docker-build
 docker-build:
