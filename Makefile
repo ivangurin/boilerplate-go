@@ -87,9 +87,8 @@ gen-proto: .install-proto-plugins
 	@go tool buf dep update
 	@echo "Generating proto files..."
 	@PATH=$(LOCAL_BIN):"$(PATH)" go tool buf generate
-	@rm ./buf.lock
 	@echo "Merging swagger files..."
-	go tool swagger mixin --quiet --ignore-conflicts -o internal/pkg/swagger/swagger.json pkg/pb/*.swagger.json
+	@go tool swagger mixin --quiet --ignore-conflicts --compact -o internal/pkg/swagger/swagger.json pkg/pb/*.swagger.json
 	@echo "Proto generation completed successfully"
 	
 .PHONY: lint-proto
