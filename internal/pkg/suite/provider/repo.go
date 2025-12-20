@@ -6,7 +6,6 @@ import (
 	"path"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -20,8 +19,7 @@ import (
 
 const dbLockPath = "/db.lock"
 
-var dbLockFile *flock.Flock
-var initOnce sync.Once
+var dbLockFile = flock.New(getLocalDirPath() + dbLockPath)
 
 func (sp *Provider) GetRepo() repository.Repo {
 	if sp.repo == nil {
@@ -108,8 +106,6 @@ func (sp *Provider) ClearDB() {
 }
 
 func lockDB(ctx context.Context) {
-	initFlock()
-
 	lockCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancel()
 
@@ -127,12 +123,6 @@ func unlockDB() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func initFlock() {
-	initOnce.Do(func() {
-		dbLockFile = flock.New(getLocalDirPath() + dbLockPath)
-	})
 }
 
 func getLocalDirPath() string {
