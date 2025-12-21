@@ -13,11 +13,13 @@ down:
 
 .PHONY: prepare-run
 prepare-run:
-	docker exec boilerplate-go-postgres-1 createdb -Upostgres $(DB_NAME) || true;
+	@echo "\033[32m▶\033[0m Preparing database..."
+	@docker exec boilerplate-go-postgres-1 createdb -Upostgres $(DB_NAME) 2> /dev/null || true;
 
 .PHONY: run
 run: prepare-run
-	go run ./cmd/boilerplate/main.go
+	@echo "\033[32m▶\033[0m Running application..."
+	@go run ./cmd/boilerplate/main.go
 
 .PHONY: build
 build:
