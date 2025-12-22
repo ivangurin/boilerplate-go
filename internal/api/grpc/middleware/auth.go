@@ -35,11 +35,16 @@ func (m *middleware) Auth(ctx context.Context, req any, info *grpc.UnaryServerIn
 		return nil, errUnauthenticated
 	}
 
+	authReq := &auth.AuthValidateRequest{}
+	if accessToken != "" {
+		authReq.AccessToken = &accessToken
+	}
+	if refreshToken != "" {
+		authReq.RefreshToken = &refreshToken
+	}
+
 	// Валидируем токен
-	authResp, err := m.authService.Validate(ctx, &auth.AuthValidateRequest{
-		AccessToken:  &accessToken,
-		RefreshToken: &refreshToken,
-	})
+	authResp, err := m.authService.Validate(ctx, authReq)
 	if err != nil {
 		return nil, errUnauthenticated
 	}
