@@ -43,6 +43,8 @@ type Logger interface {
 	Fatalf(ctx context.Context, msg string, args ...any)
 	FatalKV(ctx context.Context, msg string, values ...string)
 
+	IsWithDebug() bool
+
 	Close() error
 }
 
@@ -185,4 +187,8 @@ func (l *logger) getSpanID(ctx context.Context) string {
 		return spanCtx.SpanID().String()
 	}
 	return ""
+}
+
+func (l *logger) IsWithDebug() bool {
+	return l.logger.Core().Enabled(zap.DebugLevel)
 }
