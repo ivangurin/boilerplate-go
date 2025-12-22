@@ -11,7 +11,7 @@ import (
 )
 
 func (h *handler) Delete(ctx context.Context, req *pb.UserDeleteRequest) (*emptypb.Empty, error) {
-	err := h.usersService.Delete(ctx, convert.ToInt(req.Id))
+	err := h.usersService.Delete(ctx, convert.ToInt(req.GetUserId()))
 	if err != nil {
 		return nil, grpc.Error(err)
 	}

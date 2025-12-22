@@ -44,8 +44,8 @@ func Setup(ctx context.Context, configAPI model.ConfigAPI, grpcHandlers []model.
 		}
 	}
 
-	// Mount gateway to main router
-	router.Handle("/", gwRouter)
+	// Mount gateway to main router with prefix stripping
+	router.Handle("/api/", http.StripPrefix("/api", gwRouter))
 
 	return router, nil
 }

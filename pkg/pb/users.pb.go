@@ -26,6 +26,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// User
 type User struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -134,6 +135,7 @@ func (x *User) GetDeletedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+// UserCreateRequest
 type UserCreateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
@@ -194,27 +196,28 @@ func (x *UserCreateRequest) GetPassword() string {
 	return ""
 }
 
-type UserCreteResponse struct {
+// UserCreateResponse
+type UserCreateResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UserCreteResponse) Reset() {
-	*x = UserCreteResponse{}
+func (x *UserCreateResponse) Reset() {
+	*x = UserCreateResponse{}
 	mi := &file_users_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UserCreteResponse) String() string {
+func (x *UserCreateResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UserCreteResponse) ProtoMessage() {}
+func (*UserCreateResponse) ProtoMessage() {}
 
-func (x *UserCreteResponse) ProtoReflect() protoreflect.Message {
+func (x *UserCreateResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_users_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -226,21 +229,22 @@ func (x *UserCreteResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserCreteResponse.ProtoReflect.Descriptor instead.
-func (*UserCreteResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use UserCreateResponse.ProtoReflect.Descriptor instead.
+func (*UserCreateResponse) Descriptor() ([]byte, []int) {
 	return file_users_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UserCreteResponse) GetUser() *User {
+func (x *UserCreateResponse) GetUser() *User {
 	if x != nil {
 		return x.User
 	}
 	return nil
 }
 
+// UserGetRequest
 type UserGetRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -275,13 +279,14 @@ func (*UserGetRequest) Descriptor() ([]byte, []int) {
 	return file_users_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *UserGetRequest) GetId() int64 {
+func (x *UserGetRequest) GetUserId() int64 {
 	if x != nil {
-		return x.Id
+		return x.UserId
 	}
 	return 0
 }
 
+// UserGetResponse
 type UserGetResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
@@ -326,9 +331,10 @@ func (x *UserGetResponse) GetUser() *User {
 	return nil
 }
 
+// UserUpdateRequest
 type UserUpdateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,proto3" json:"user_id,omitempty"`
 	Name          *string                `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
 	Password      *string                `protobuf:"bytes,3,opt,name=password,proto3,oneof" json:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -365,9 +371,9 @@ func (*UserUpdateRequest) Descriptor() ([]byte, []int) {
 	return file_users_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *UserUpdateRequest) GetId() int64 {
+func (x *UserUpdateRequest) GetUserId() int64 {
 	if x != nil {
-		return x.Id
+		return x.UserId
 	}
 	return 0
 }
@@ -386,6 +392,7 @@ func (x *UserUpdateRequest) GetPassword() string {
 	return ""
 }
 
+// UserUpdateResponse
 type UserUpdateResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
@@ -430,9 +437,10 @@ func (x *UserUpdateResponse) GetUser() *User {
 	return nil
 }
 
+// UserDeleteRequest
 type UserDeleteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -467,9 +475,9 @@ func (*UserDeleteRequest) Descriptor() ([]byte, []int) {
 	return file_users_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *UserDeleteRequest) GetId() int64 {
+func (x *UserDeleteRequest) GetUserId() int64 {
 	if x != nil {
-		return x.Id
+		return x.UserId
 	}
 	return 0
 }
@@ -499,29 +507,29 @@ const file_users_proto_rawDesc = "" +
 	"\x11UserCreateRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpassword\"4\n" +
-	"\x11UserCreteResponse\x12\x1f\n" +
-	"\x04user\x18\x01 \x01(\v2\v.users.UserR\x04user\" \n" +
-	"\x0eUserGetRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"2\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\"5\n" +
+	"\x12UserCreateResponse\x12\x1f\n" +
+	"\x04user\x18\x01 \x01(\v2\v.users.UserR\x04user\"*\n" +
+	"\x0eUserGetRequest\x12\x18\n" +
+	"\auser_id\x18\x01 \x01(\x03R\auser_id\"2\n" +
 	"\x0fUserGetResponse\x12\x1f\n" +
-	"\x04user\x18\x01 \x01(\v2\v.users.UserR\x04user\"s\n" +
-	"\x11UserUpdateRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x17\n" +
+	"\x04user\x18\x01 \x01(\v2\v.users.UserR\x04user\"}\n" +
+	"\x11UserUpdateRequest\x12\x18\n" +
+	"\auser_id\x18\x01 \x01(\x03R\auser_id\x12\x17\n" +
 	"\x04name\x18\x02 \x01(\tH\x00R\x04name\x88\x01\x01\x12\x1f\n" +
 	"\bpassword\x18\x03 \x01(\tH\x01R\bpassword\x88\x01\x01B\a\n" +
 	"\x05_nameB\v\n" +
 	"\t_password\"5\n" +
 	"\x12UserUpdateResponse\x12\x1f\n" +
-	"\x04user\x18\x01 \x01(\v2\v.users.UserR\x04user\"#\n" +
-	"\x11UserDeleteRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id2\xce\x02\n" +
-	"\bUsersAPI\x12O\n" +
-	"\x06Create\x12\x18.users.UserCreateRequest\x1a\x18.users.UserCreteResponse\"\x11\x82\xd3\xe4\x93\x02\v:\x01*\"\x06/users\x12I\n" +
-	"\x03Get\x12\x15.users.UserGetRequest\x1a\x16.users.UserGetResponse\"\x13\x82\xd3\xe4\x93\x02\r\x12\v/users/{id}\x12U\n" +
-	"\x06Update\x12\x18.users.UserUpdateRequest\x1a\x19.users.UserUpdateResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*2\v/users/{id}\x12O\n" +
-	"\x06Delete\x12\x18.users.UserDeleteRequest\x1a\x16.google.protobuf.Empty\"\x13\x82\xd3\xe4\x93\x02\r*\v/users/{id}B\xca\x01\x92Ak\x12\x12\n" +
-	"\tUsers API2\x051.0.0*\x02\x01\x022\x10application/json:\x10application/jsonZ\x1f\n" +
+	"\x04user\x18\x01 \x01(\v2\v.users.UserR\x04user\"-\n" +
+	"\x11UserDeleteRequest\x12\x18\n" +
+	"\auser_id\x18\x01 \x01(\x03R\auser_id2\xde\x02\n" +
+	"\bUsersAPI\x12P\n" +
+	"\x06Create\x12\x18.users.UserCreateRequest\x1a\x19.users.UserCreateResponse\"\x11\x82\xd3\xe4\x93\x02\v:\x01*\"\x06/users\x12N\n" +
+	"\x03Get\x12\x15.users.UserGetRequest\x1a\x16.users.UserGetResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/users/{user_id}\x12Z\n" +
+	"\x06Update\x12\x18.users.UserUpdateRequest\x1a\x19.users.UserUpdateResponse\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*2\x10/users/{user_id}\x12T\n" +
+	"\x06Delete\x12\x18.users.UserDeleteRequest\x1a\x16.google.protobuf.Empty\"\x18\x82\xd3\xe4\x93\x02\x12*\x10/users/{user_id}B\xcc\x01\x92Am\x12\x12\n" +
+	"\tUsers API2\x051.0.0\"\x04/api2\x10application/json:\x10application/jsonZ\x1f\n" +
 	"\x1d\n" +
 	"\x06x-auth\x12\x13\b\x02\x1a\rauthorization \x02b\f\n" +
 	"\n" +
@@ -546,7 +554,7 @@ var file_users_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_users_proto_goTypes = []any{
 	(*User)(nil),                  // 0: users.User
 	(*UserCreateRequest)(nil),     // 1: users.UserCreateRequest
-	(*UserCreteResponse)(nil),     // 2: users.UserCreteResponse
+	(*UserCreateResponse)(nil),    // 2: users.UserCreateResponse
 	(*UserGetRequest)(nil),        // 3: users.UserGetRequest
 	(*UserGetResponse)(nil),       // 4: users.UserGetResponse
 	(*UserUpdateRequest)(nil),     // 5: users.UserUpdateRequest
@@ -559,14 +567,14 @@ var file_users_proto_depIdxs = []int32{
 	8,  // 0: users.User.created_at:type_name -> google.protobuf.Timestamp
 	8,  // 1: users.User.updated_at:type_name -> google.protobuf.Timestamp
 	8,  // 2: users.User.deleted_at:type_name -> google.protobuf.Timestamp
-	0,  // 3: users.UserCreteResponse.user:type_name -> users.User
+	0,  // 3: users.UserCreateResponse.user:type_name -> users.User
 	0,  // 4: users.UserGetResponse.user:type_name -> users.User
 	0,  // 5: users.UserUpdateResponse.user:type_name -> users.User
 	1,  // 6: users.UsersAPI.Create:input_type -> users.UserCreateRequest
 	3,  // 7: users.UsersAPI.Get:input_type -> users.UserGetRequest
 	5,  // 8: users.UsersAPI.Update:input_type -> users.UserUpdateRequest
 	7,  // 9: users.UsersAPI.Delete:input_type -> users.UserDeleteRequest
-	2,  // 10: users.UsersAPI.Create:output_type -> users.UserCreteResponse
+	2,  // 10: users.UsersAPI.Create:output_type -> users.UserCreateResponse
 	4,  // 11: users.UsersAPI.Get:output_type -> users.UserGetResponse
 	6,  // 12: users.UsersAPI.Update:output_type -> users.UserUpdateResponse
 	9,  // 13: users.UsersAPI.Delete:output_type -> google.protobuf.Empty

@@ -71,13 +71,13 @@ func request_UsersAPI_Get_0(ctx context.Context, marshaler runtime.Marshaler, cl
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
 	}
-	val, ok := pathParams["id"]
+	val, ok := pathParams["user_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_id")
 	}
-	protoReq.Id, err = runtime.Int64(val)
+	protoReq.UserId, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 	msg, err := client.Get(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -89,13 +89,13 @@ func local_request_UsersAPI_Get_0(ctx context.Context, marshaler runtime.Marshal
 		metadata runtime.ServerMetadata
 		err      error
 	)
-	val, ok := pathParams["id"]
+	val, ok := pathParams["user_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_id")
 	}
-	protoReq.Id, err = runtime.Int64(val)
+	protoReq.UserId, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 	msg, err := server.Get(ctx, &protoReq)
 	return msg, metadata, err
@@ -113,13 +113,13 @@ func request_UsersAPI_Update_0(ctx context.Context, marshaler runtime.Marshaler,
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
 	}
-	val, ok := pathParams["id"]
+	val, ok := pathParams["user_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_id")
 	}
-	protoReq.Id, err = runtime.Int64(val)
+	protoReq.UserId, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 	msg, err := client.Update(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -134,13 +134,13 @@ func local_request_UsersAPI_Update_0(ctx context.Context, marshaler runtime.Mars
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	val, ok := pathParams["id"]
+	val, ok := pathParams["user_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_id")
 	}
-	protoReq.Id, err = runtime.Int64(val)
+	protoReq.UserId, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 	msg, err := server.Update(ctx, &protoReq)
 	return msg, metadata, err
@@ -155,13 +155,13 @@ func request_UsersAPI_Delete_0(ctx context.Context, marshaler runtime.Marshaler,
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
 	}
-	val, ok := pathParams["id"]
+	val, ok := pathParams["user_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_id")
 	}
-	protoReq.Id, err = runtime.Int64(val)
+	protoReq.UserId, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 	msg, err := client.Delete(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -173,13 +173,13 @@ func local_request_UsersAPI_Delete_0(ctx context.Context, marshaler runtime.Mars
 		metadata runtime.ServerMetadata
 		err      error
 	)
-	val, ok := pathParams["id"]
+	val, ok := pathParams["user_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "user_id")
 	}
-	protoReq.Id, err = runtime.Int64(val)
+	protoReq.UserId, err = runtime.Int64(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "user_id", err)
 	}
 	msg, err := server.Delete(ctx, &protoReq)
 	return msg, metadata, err
@@ -217,7 +217,7 @@ func RegisterUsersAPIHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/users.UsersAPI/Get", runtime.WithHTTPPathPattern("/users/{id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/users.UsersAPI/Get", runtime.WithHTTPPathPattern("/users/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -237,7 +237,7 @@ func RegisterUsersAPIHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/users.UsersAPI/Update", runtime.WithHTTPPathPattern("/users/{id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/users.UsersAPI/Update", runtime.WithHTTPPathPattern("/users/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -257,7 +257,7 @@ func RegisterUsersAPIHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/users.UsersAPI/Delete", runtime.WithHTTPPathPattern("/users/{id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/users.UsersAPI/Delete", runtime.WithHTTPPathPattern("/users/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -332,7 +332,7 @@ func RegisterUsersAPIHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/users.UsersAPI/Get", runtime.WithHTTPPathPattern("/users/{id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/users.UsersAPI/Get", runtime.WithHTTPPathPattern("/users/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -349,7 +349,7 @@ func RegisterUsersAPIHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/users.UsersAPI/Update", runtime.WithHTTPPathPattern("/users/{id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/users.UsersAPI/Update", runtime.WithHTTPPathPattern("/users/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -366,7 +366,7 @@ func RegisterUsersAPIHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/users.UsersAPI/Delete", runtime.WithHTTPPathPattern("/users/{id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/users.UsersAPI/Delete", runtime.WithHTTPPathPattern("/users/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -384,9 +384,9 @@ func RegisterUsersAPIHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 
 var (
 	pattern_UsersAPI_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"users"}, ""))
-	pattern_UsersAPI_Get_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "id"}, ""))
-	pattern_UsersAPI_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "id"}, ""))
-	pattern_UsersAPI_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "id"}, ""))
+	pattern_UsersAPI_Get_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_id"}, ""))
+	pattern_UsersAPI_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_id"}, ""))
+	pattern_UsersAPI_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "user_id"}, ""))
 )
 
 var (

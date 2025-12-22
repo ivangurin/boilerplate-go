@@ -25,6 +25,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// AuthLoginRequest
 type AuthLoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
@@ -77,6 +78,7 @@ func (x *AuthLoginRequest) GetPassword() string {
 	return ""
 }
 
+// AuthLoginResponse
 type AuthLoginResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,proto3" json:"access_token,omitempty"`
@@ -129,6 +131,7 @@ func (x *AuthLoginResponse) GetRefreshToken() string {
 	return ""
 }
 
+// AuthRefreshRequest
 type AuthRefreshRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,proto3" json:"refresh_token,omitempty"`
@@ -173,6 +176,7 @@ func (x *AuthRefreshRequest) GetRefreshToken() string {
 	return ""
 }
 
+// AuthRefreshResponse
 type AuthRefreshResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,proto3" json:"access_token,omitempty"`
@@ -225,6 +229,7 @@ func (x *AuthRefreshResponse) GetRefreshToken() string {
 	return ""
 }
 
+// AuthMeResponse
 type AuthMeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
@@ -293,8 +298,8 @@ const file_auth_proto_rawDesc = "" +
 	"\x06Logout\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\"\x17\x82\xd3\xe4\x93\x02\x11:\x01*\"\f/auth/logout\x12]\n" +
 	"\aRefresh\x12\x18.auth.AuthRefreshRequest\x1a\x19.auth.AuthRefreshResponse\"\x1d\x92A\x02b\x00\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/auth/refresh\x12D\n" +
 	"\x02Me\x12\x16.google.protobuf.Empty\x1a\x14.auth.AuthMeResponse\"\x10\x82\xd3\xe4\x93\x02\n" +
-	"\x12\b/auth/meB\xc3\x01\x92Aj\x12\x11\n" +
-	"\bAuth API2\x051.0.0*\x02\x01\x022\x10application/json:\x10application/jsonZ\x1f\n" +
+	"\x12\b/auth/meB\xc5\x01\x92Al\x12\x11\n" +
+	"\bAuth API2\x051.0.0\"\x04/api2\x10application/json:\x10application/jsonZ\x1f\n" +
 	"\x1d\n" +
 	"\x06x-auth\x12\x13\b\x02\x1a\rauthorization \x02b\f\n" +
 	"\n" +

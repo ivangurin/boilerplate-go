@@ -29,10 +29,16 @@ const (
 // AuthAPIClient is the client API for AuthAPI service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// AuthAPI
 type AuthAPIClient interface {
+	// Login
 	Login(ctx context.Context, in *AuthLoginRequest, opts ...grpc.CallOption) (*AuthLoginResponse, error)
+	// Logout
 	Logout(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Refresh
 	Refresh(ctx context.Context, in *AuthRefreshRequest, opts ...grpc.CallOption) (*AuthRefreshResponse, error)
+	// Me
 	Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*AuthMeResponse, error)
 }
 
@@ -87,10 +93,16 @@ func (c *authAPIClient) Me(ctx context.Context, in *emptypb.Empty, opts ...grpc.
 // AuthAPIServer is the server API for AuthAPI service.
 // All implementations must embed UnimplementedAuthAPIServer
 // for forward compatibility.
+//
+// AuthAPI
 type AuthAPIServer interface {
+	// Login
 	Login(context.Context, *AuthLoginRequest) (*AuthLoginResponse, error)
+	// Logout
 	Logout(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	// Refresh
 	Refresh(context.Context, *AuthRefreshRequest) (*AuthRefreshResponse, error)
+	// Me
 	Me(context.Context, *emptypb.Empty) (*AuthMeResponse, error)
 	mustEmbedUnimplementedAuthAPIServer()
 }

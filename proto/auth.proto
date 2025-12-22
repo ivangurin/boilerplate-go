@@ -12,85 +12,94 @@ import "users.proto";
 option go_package = "boilerplate/pkg/pb/auth;auth";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-    info: {
-        title: "Auth API";
-        version: "1.0.0";
-    };
-    schemes: HTTP;
-    schemes: HTTPS;
-    consumes: "application/json";
-    produces: "application/json";
-    security_definitions: {
-        security: {
-            key: "x-auth";
-            value: {
-                type: TYPE_API_KEY;
-                in: IN_HEADER;
-                name: "authorization";
-            }
-        }
-    }
+  info: {
+    title  : "Auth API";
+    version: "1.0.0";
+  };
+  base_path           : "/api";
+  consumes            : "application/json";
+  produces            : "application/json";
+  security_definitions: {
     security: {
-        security_requirement: {
-            key: "x-auth";
-        }
+      key  : "x-auth";
+      value: {
+        type: TYPE_API_KEY;
+        in  : IN_HEADER;
+        name: "authorization";
+      }
     }
+  }
+  security: {
+    security_requirement: {
+      key: "x-auth";
+    }
+  }
 };
 
+// AuthAPI
 service AuthAPI {
-    rpc Login (AuthLoginRequest) returns (AuthLoginResponse) {
-        option (google.api.http) = {
-            post: "/auth/login"
-            body: "*"
-        };
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            security: {}  // публичный метод, авторизация не требуется
-        };
-    }
+    // Login
+  rpc Login (AuthLoginRequest) returns (AuthLoginResponse) {
+    option (google.api.http) = {
+      post: "/auth/login"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: {}  // публичный метод, авторизация не требуется
+    };
+  }
 
-    rpc Logout (google.protobuf.Empty) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            post: "/auth/logout"
-            body: "*"
-        };
-    }
+    // Logout
+  rpc Logout (google.protobuf.Empty) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/auth/logout"
+      body: "*"
+    };
+  }
 
-    rpc Refresh (AuthRefreshRequest) returns (AuthRefreshResponse) {
-        option (google.api.http) = {
-            post: "/auth/refresh"
-            body: "*"
-        };
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            security: {}  // публичный метод, авторизация не требуется
-        };
-    }
+    // Refresh
+  rpc Refresh (AuthRefreshRequest) returns (AuthRefreshResponse) {
+    option (google.api.http) = {
+      post: "/auth/refresh"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      security: {}  // публичный метод, авторизация не требуется
+    };
+  }
 
-    rpc Me (google.protobuf.Empty) returns (AuthMeResponse) {
-        option (google.api.http) = {
-            get: "/auth/me"
-        };
-    }
+    // Me
+  rpc Me (google.protobuf.Empty) returns (AuthMeResponse) {
+    option (google.api.http) = {
+      get: "/auth/me"
+    };
+  }
 }
 
+// AuthLoginRequest
 message AuthLoginRequest{
-    string email = 1 [json_name = "email"];
-    string password = 2 [json_name = "password"];
+  string email    = 1 [json_name = "email"];
+  string password = 2 [json_name = "password"];
 }
 
+// AuthLoginResponse
 message AuthLoginResponse{
-    string access_token = 1 [json_name = "access_token"];
-    string refresh_token = 2 [json_name = "refresh_token"];
+  string access_token  = 1 [json_name = "access_token"];
+  string refresh_token = 2 [json_name = "refresh_token"];
 }
 
+// AuthRefreshRequest
 message AuthRefreshRequest{
-    string refresh_token = 1 [json_name = "refresh_token"];
+  string refresh_token = 1 [json_name = "refresh_token"];
 }
 
+// AuthRefreshResponse
 message AuthRefreshResponse{
-    string access_token = 1 [json_name = "access_token"];
-    string refresh_token = 2 [json_name = "refresh_token"];
+  string access_token  = 1 [json_name = "access_token"];
+  string refresh_token = 2 [json_name = "refresh_token"];
 }
 
+// AuthMeResponse
 message AuthMeResponse{
-    users.User user = 1 [json_name = "user"];
+  users.User user = 1 [json_name = "user"];
 }

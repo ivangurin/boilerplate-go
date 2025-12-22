@@ -29,10 +29,16 @@ const (
 // UsersAPIClient is the client API for UsersAPI service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// UsersAPI
 type UsersAPIClient interface {
-	Create(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*UserCreteResponse, error)
+	// Create
+	Create(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*UserCreateResponse, error)
+	// Get
 	Get(ctx context.Context, in *UserGetRequest, opts ...grpc.CallOption) (*UserGetResponse, error)
+	// Update
 	Update(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*UserUpdateResponse, error)
+	// Delete
 	Delete(ctx context.Context, in *UserDeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -44,9 +50,9 @@ func NewUsersAPIClient(cc grpc.ClientConnInterface) UsersAPIClient {
 	return &usersAPIClient{cc}
 }
 
-func (c *usersAPIClient) Create(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*UserCreteResponse, error) {
+func (c *usersAPIClient) Create(ctx context.Context, in *UserCreateRequest, opts ...grpc.CallOption) (*UserCreateResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UserCreteResponse)
+	out := new(UserCreateResponse)
 	err := c.cc.Invoke(ctx, UsersAPI_Create_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -87,10 +93,16 @@ func (c *usersAPIClient) Delete(ctx context.Context, in *UserDeleteRequest, opts
 // UsersAPIServer is the server API for UsersAPI service.
 // All implementations must embed UnimplementedUsersAPIServer
 // for forward compatibility.
+//
+// UsersAPI
 type UsersAPIServer interface {
-	Create(context.Context, *UserCreateRequest) (*UserCreteResponse, error)
+	// Create
+	Create(context.Context, *UserCreateRequest) (*UserCreateResponse, error)
+	// Get
 	Get(context.Context, *UserGetRequest) (*UserGetResponse, error)
+	// Update
 	Update(context.Context, *UserUpdateRequest) (*UserUpdateResponse, error)
+	// Delete
 	Delete(context.Context, *UserDeleteRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUsersAPIServer()
 }
@@ -102,7 +114,7 @@ type UsersAPIServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUsersAPIServer struct{}
 
-func (UnimplementedUsersAPIServer) Create(context.Context, *UserCreateRequest) (*UserCreteResponse, error) {
+func (UnimplementedUsersAPIServer) Create(context.Context, *UserCreateRequest) (*UserCreateResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Create not implemented")
 }
 func (UnimplementedUsersAPIServer) Get(context.Context, *UserGetRequest) (*UserGetResponse, error) {
