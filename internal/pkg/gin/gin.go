@@ -86,7 +86,3 @@ func GetRefreshToken(ctx *gin.Context) (string, bool) {
 func SetUserID(ctx *gin.Context, userID int) {
 	ctx.Set(metadata.KeyUserID, userID)
 }
-
-func SetUserName(ctx *gin.Context, userName string) {
-	ctx.Set(metadata.KeyUserName, userName)
-}

@@ -30,10 +30,6 @@ func (m *middleware) Auth() gin.HandlerFunc {
 			gin_pkg.SetUserID(ctx, *resp.UserID)
 		}
 
-		if resp.UserName != nil {
-			gin_pkg.SetUserName(ctx, *resp.UserName)
-		}
-
 		if resp.AccessToken != nil {
 			gin_pkg.SetAccessToken(ctx, *resp.AccessToken, m.authService.GetConfig().AccessTokenTTL)
 		}

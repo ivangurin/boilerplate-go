@@ -51,11 +51,7 @@ func (m *middleware) Auth(ctx context.Context, req any, info *grpc.UnaryServerIn
 
 	// Добавляем данные пользователя в контекст
 	if authResp.UserID != nil {
-		ctx = metadata_pkg.SetUserID(ctx, *authResp.UserID)
-	}
-
-	if authResp.UserName != nil {
-		ctx = metadata_pkg.SetUserName(ctx, *authResp.UserName)
+		ctx = metadata_pkg.WithUserID(ctx, *authResp.UserID)
 	}
 
 	if authResp.AccessToken != nil {
