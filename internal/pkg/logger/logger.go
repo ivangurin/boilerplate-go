@@ -19,29 +19,31 @@ const (
 )
 
 type Logger interface {
+	With(key string, value string) Logger
+
 	Debug(ctx context.Context, msg string)
 	Debugf(ctx context.Context, msg string, args ...any)
-	DebugKV(ctx context.Context, msg string, values ...string)
+	DebugKV(ctx context.Context, msg string, values ...any)
 
 	Info(ctx context.Context, msg string)
 	Infof(ctx context.Context, msg string, args ...any)
-	InfoKV(ctx context.Context, msg string, values ...string)
+	InfoKV(ctx context.Context, msg string, values ...any)
 
 	Warn(ctx context.Context, msg string)
 	Warnf(ctx context.Context, msg string, args ...any)
-	WarnKV(ctx context.Context, msg string, values ...string)
+	WarnKV(ctx context.Context, msg string, values ...any)
 
 	Error(ctx context.Context, msg string)
 	Errorf(ctx context.Context, msg string, args ...any)
-	ErrorKV(ctx context.Context, msg string, values ...string)
+	ErrorKV(ctx context.Context, msg string, values ...any)
 
 	Panic(ctx context.Context, msg string)
 	Panicf(ctx context.Context, msg string, args ...any)
-	PanicKV(ctx context.Context, msg string, values ...string)
+	PanicKV(ctx context.Context, msg string, values ...any)
 
 	Fatal(ctx context.Context, msg string)
 	Fatalf(ctx context.Context, msg string, args ...any)
-	FatalKV(ctx context.Context, msg string, values ...string)
+	FatalKV(ctx context.Context, msg string, values ...any)
 
 	IsWithDebug() bool
 
@@ -63,6 +65,12 @@ func New(opts ...ConfigOption) (Logger, error) {
 	}, nil
 }
 
+func (l *logger) With(key string, value string) Logger {
+	return &logger{
+		logger: l.logger.With(zap.String(key, value)),
+	}
+}
+
 func (l *logger) Close() error {
 	err := l.logger.Sync()
 	if err != nil && !errors.Is(err, syscall.ENOTTY) {
@@ -79,7 +87,7 @@ func (l *logger) Debugf(ctx context.Context, msg string, args ...any) {
 	l.logger.Debug(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *logger) DebugKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) DebugKV(ctx context.Context, msg string, values ...any) {
 	l.logger.Debug(msg, l.getFields(ctx, values)...)
 }
 
@@ -91,7 +99,7 @@ func (l *logger) Infof(ctx context.Context, msg string, args ...any) {
 	l.logger.Info(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *logger) InfoKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) InfoKV(ctx context.Context, msg string, values ...any) {
 	l.logger.Info(msg, l.getFields(ctx, values)...)
 }
 
@@ -103,7 +111,7 @@ func (l *logger) Warnf(ctx context.Context, msg string, args ...any) {
 	l.logger.Warn(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *logger) WarnKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) WarnKV(ctx context.Context, msg string, values ...any) {
 	l.logger.Warn(msg, l.getFields(ctx, values)...)
 }
 
@@ -115,7 +123,7 @@ func (l *logger) Errorf(ctx context.Context, msg string, args ...any) {
 	l.logger.Error(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *logger) ErrorKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) ErrorKV(ctx context.Context, msg string, values ...any) {
 	l.logger.Error(msg, l.getFields(ctx, values)...)
 }
 
@@ -127,7 +135,7 @@ func (l *logger) Panicf(ctx context.Context, msg string, args ...any) {
 	l.logger.Panic(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *logger) PanicKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) PanicKV(ctx context.Context, msg string, values ...any) {
 	l.logger.Panic(msg, l.getFields(ctx, values)...)
 }
 
@@ -139,15 +147,31 @@ func (l *logger) Fatalf(ctx context.Context, msg string, args ...any) {
 	l.logger.Fatal(fmt.Sprintf(msg, args...), l.getFields(ctx, nil)...)
 }
 
-func (l *logger) FatalKV(ctx context.Context, msg string, values ...string) {
+func (l *logger) FatalKV(ctx context.Context, msg string, values ...any) {
 	l.logger.Fatal(msg, l.getFields(ctx, values)...)
 }
 
-func (l *logger) getFields(ctx context.Context, values []string) []zap.Field {
+func (l *logger) getFields(ctx context.Context, values []any) []zap.Field {
 	fields := make([]zap.Field, 0, len(values)/2+2)
 
 	for i := 0; i < len(values)-1; i += 2 {
-		fields = append(fields, zap.String(values[i], fmt.Sprint(values[i+1])))
+		key, ok := values[i].(string)
+		if !ok {
+			key = fmt.Sprint(values[i])
+		}
+
+		switch v := values[i+1].(type) {
+		case string:
+			fields = append(fields, zap.String(key, v))
+		case int:
+			fields = append(fields, zap.Int(key, v))
+		case bool:
+			fields = append(fields, zap.Bool(key, v))
+		case float64:
+			fields = append(fields, zap.Float64(key, v))
+		default:
+			fields = append(fields, zap.Any(key, v))
+		}
 	}
 
 	traceID := l.getTraceID(ctx)
