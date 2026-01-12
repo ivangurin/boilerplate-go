@@ -1,0 +1,389 @@
+definitions:
+  auth.AuthLoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.AuthLoginResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+      user:
+        $ref: '#/definitions/users.User'
+    type: object
+  auth.AuthRefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  auth.AuthRefreshResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  model.HandlerError:
+    properties:
+      error:
+        type: string
+    type: object
+  model.UserRole:
+    enum:
+    - user
+    - admin
+    type: string
+    x-enum-varnames:
+    - UserRoleUser
+    - UserRoleAdmin
+  users.User:
+    properties:
+      created_at:
+        type: string
+      deleted:
+        type: boolean
+      deleted_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      is_admin:
+        type: boolean
+      name:
+        type: string
+      role:
+        $ref: '#/definitions/model.UserRole'
+      updated_at:
+        type: string
+    type: object
+  users.UserCreateRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  users.UserUpdateRequest:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      parameters:
+      - description: user
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.AuthLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.AuthLoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+      summary: Login
+      tags:
+      - AuthAPI
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Logout
+      tags:
+      - AuthAPI
+  /auth/me:
+    get:
+      consumes:
+      - application/json
+      description: Hwo am I
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/users.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+      summary: Me
+      tags:
+      - AuthAPI
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh
+      parameters:
+      - description: user
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.AuthRefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.AuthRefreshResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+      summary: Refresh
+      tags:
+      - AuthAPI
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Search users
+      parameters:
+      - collectionFormat: csv
+        description: user id
+        in: query
+        items:
+          type: integer
+        name: id
+        type: array
+      - description: name
+        in: query
+        name: name
+        type: string
+      - description: email
+        in: query
+        name: email
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: sort
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/users.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+      summary: Search users
+      tags:
+      - UsersAPI
+    patch:
+      consumes:
+      - application/json
+      description: Update user
+      parameters:
+      - description: user data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/users.UserUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/users.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+      summary: Update user
+      tags:
+      - UsersAPI
+    post:
+      consumes:
+      - application/json
+      description: Create user
+      parameters:
+      - description: user data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/users.UserCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/users.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+      summary: Create user
+      tags:
+      - UsersAPI
+  /users/{userid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user
+      parameters:
+      - description: user id
+        in: path
+        name: userid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+      summary: Delete user
+      tags:
+      - UsersAPI
+    get:
+      consumes:
+      - application/json
+      description: Get user
+      parameters:
+      - description: user id
+        in: path
+        name: userid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/users.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.HandlerError'
+      summary: Get user
+      tags:
+      - UsersAPI
+swagger: "2.0"

@@ -138,10 +138,67 @@ func defineFlags(cmd *cobra.Command, config *model.Config) error {
 		return fmt.Errorf("bind api.refresh-token-ttl: %w", err)
 	}
 
+	// S3
+	if err = bindStringVar(cmd, &config.S3.Host, "s3.host", "localhost", "S3 Host"); err != nil {
+		return fmt.Errorf("bind s3.host: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.S3.Port, "s3.port", "9000", "S3 Port"); err != nil {
+		return fmt.Errorf("bind s3.port: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.S3.AccessKey, "s3.access-key", "admin", "S3 Access Key"); err != nil {
+		return fmt.Errorf("bind s3.access-key: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.S3.SecretKey, "s3.secret-key", "password", "S3 Secret Key"); err != nil {
+		return fmt.Errorf("bind s3.secret-key: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.S3.Bucket, "s3.bucket", "greenaid", "S3 Bucket"); err != nil {
+		return fmt.Errorf("bind s3.bucket: %w", err)
+	}
+
+	// NATS
+	if err = bindStringVar(cmd, &config.Nats.Host, "nats.host", "localhost", "NATS Host"); err != nil {
+		return fmt.Errorf("bind nats.host: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.Nats.Port, "nats.port", "4222", "NATS Port"); err != nil {
+		return fmt.Errorf("bind nats.port: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.Nats.HTTPPort, "nats.http-port", "8222", "NATS HTTP Port"); err != nil {
+		return fmt.Errorf("bind nats.http-port: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.Nats.Domain, "nats.domain", "GREENAID", "NATS Domain"); err != nil {
+		return fmt.Errorf("bind nats.domain: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.Nats.DataDir, "nats.data-dir", "./tmp/nats", "NATS Data Directory"); err != nil {
+		return fmt.Errorf("bind nats.data-dir: %w", err)
+	}
+
+	// Mail
+	if err = bindStringVar(cmd, &config.Mail.SMTPHost, "mail.smtp-host", "smtp.example.com", "Mail SMTP Host"); err != nil {
+		return fmt.Errorf("bind mail.smtp-host: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.Mail.SMTPPort, "mail.smtp-port", "465", "Mail SMTP Port"); err != nil {
+		return fmt.Errorf("bind mail.smtp-port: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.Mail.Username, "mail.username", "user@example.com", "Mail Username"); err != nil {
+		return fmt.Errorf("bind mail.username: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.Mail.Password, "mail.password", "password", "Mail Password"); err != nil {
+		return fmt.Errorf("bind mail.password: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.Mail.From, "mail.from", "noreply@example.com", "Mail From Email"); err != nil {
+		return fmt.Errorf("bind mail.from: %w", err)
+	}
+	if err = bindBoolVar(cmd, &config.Mail.SSL, "mail.ssl", false, "Mail Use SSL"); err != nil {
+		return fmt.Errorf("bind mail.ssl: %w", err)
+	}
+	if err = bindBoolVar(cmd, &config.Mail.TLS, "mail.tls", true, "Mail Use TLS"); err != nil {
+		return fmt.Errorf("bind mail.tls: %w", err)
+	}
+
 	return nil
 }
 
-func bindStringVar(cmd *cobra.Command, p *string, name string, value string, usage string) error {
+func bindStringVar(cmd *cobra.Command, p *string, name, value, usage string) error {
 	cmd.PersistentFlags().StringVar(p, name, value, usage)
 	err := viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
 	if err != nil {

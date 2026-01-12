@@ -70,7 +70,7 @@ gen-mock:
 gen-swag:
 	@echo "\033[32m▶\033[0m Generating swagger docs..."
 	@go tool swag fmt	
-	@go tool swag init --parseDependency --parseInternal -g handlers.go -d internal/api/handlers -o internal/api/swagger
+	@go tool swag init --parseDependency --parseInternal -g handlers.go -d internal/api/http/handlers -o internal/api/swagger
 
 .PHONY: proto-deps
 proto-deps:

@@ -1,11 +1,12 @@
 package logger
 
 import (
-	"boilerplate/internal/pkg/metadata"
 	"context"
 	"errors"
 	"fmt"
 	"syscall"
+
+	"boilerplate/internal/pkg/metadata"
 
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
@@ -15,11 +16,12 @@ const (
 	fieldTraceID   = "trace_id"
 	fieldSpanID    = "span_id"
 	fieldRequestID = "request_id"
+	fieldUserID    = "user_id"
 	fieldIP        = "ip"
 )
 
 type Logger interface {
-	With(key string, value string) Logger
+	With(key, value string) Logger
 
 	Debug(ctx context.Context, msg string)
 	Debugf(ctx context.Context, msg string, args ...any)
@@ -65,7 +67,7 @@ func New(opts ...ConfigOption) (Logger, error) {
 	}, nil
 }
 
-func (l *logger) With(key string, value string) Logger {
+func (l *logger) With(key, value string) Logger {
 	return &logger{
 		logger: l.logger.With(zap.String(key, value)),
 	}
@@ -187,6 +189,11 @@ func (l *logger) getFields(ctx context.Context, values []any) []zap.Field {
 	requestID, exist := metadata.GetRequestID(ctx)
 	if exist {
 		fields = append(fields, zap.String(fieldRequestID, requestID))
+	}
+
+	userID, exist := metadata.GetUserID(ctx)
+	if exist {
+		fields = append(fields, zap.Int(fieldUserID, userID))
 	}
 
 	ip, exist := metadata.GetIP(ctx)
