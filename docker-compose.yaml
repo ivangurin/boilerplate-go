@@ -13,8 +13,36 @@ services:
     ports:
       - "5432:5432"
 
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password
+    ports:
+      - "9000:9000" # MinIO API port
+      - "9001:9001" # MinIO Console port
+    volumes:
+      - minio-data:/data
+    networks:
+      - boilerplate-network
+    command: server /data --console-address ":9001"
+
+  chrome:
+    image: browserless/chrome:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - MAX_CONCURRENT_SESSIONS=10
+      - CONNECTION_TIMEOUT=60000
+      - MAX_QUEUE_LENGTH=20
+      - PREBOOT_CHROME=true
+    shm_size: 2gb
+    networks:
+      - boilerplate-network
+
 volumes:
   pg-data:
+  minio-data:
 
 networks:
   boilerplate-network:

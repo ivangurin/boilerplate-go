@@ -61,8 +61,8 @@ test: prepare-test
 	@go tool cover -func coverage.out | grep total | awk '{print "Coverage percent: " $$3}'
 	@rm -f coverage.out
 
-.PHONY: gen-mock
-gen-mock: 
+.PHONY: gen-mocks
+gen-mocks: 
 	@echo "\033[32m▶\033[0m Generating mocks..."
 	@go tool mockery
 
@@ -111,7 +111,7 @@ format:
 	@go tool gofumpt -l -w -extra .
 
 .PHONY: generate
-generate: format gen-mock gen-swag gen-proto
+generate: format gen-mocks gen-swag gen-proto
 	@echo "\033[32m▶\033[0m Code generation completed successfully"
 
 .PHONY: docker-build

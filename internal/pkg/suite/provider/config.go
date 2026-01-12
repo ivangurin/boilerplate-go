@@ -21,9 +21,22 @@ func InitConfig() *model.Config {
 		},
 		API: model.ConfigAPI{
 			HTTPPort:         "8080",
+			GRPCPort:         "8082",
 			AccessPrivateKey: "dd4dcf2eae3c3a6f097d69f49ce584852d66ac85505f5d264e1b6fb8f90d9019",
 			AccessTokenTTL:   10,
 			RefreshTokenTTL:  60,
+		},
+		S3: model.ConfigS3{
+			Host:      "localhost",
+			Port:      "9000",
+			AccessKey: "admin",
+			SecretKey: "password",
+			Bucket:    "boilerplate-test",
+		},
+		Chrome: model.ConfigChrome{
+			Host:    "localhost",
+			Port:    "3000",
+			Timeout: 30,
 		},
 	}
 }

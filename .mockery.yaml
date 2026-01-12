@@ -8,4 +8,6 @@ issue-845-fix: true
 resolve-type-alias: false
 disable-version-string: true
 packages:
+  boilerplate/internal/model:
+  boilerplate/internal/pkg/clients/mail:
   boilerplate/internal/services/users:

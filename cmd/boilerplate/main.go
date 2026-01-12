@@ -155,6 +155,17 @@ func defineFlags(cmd *cobra.Command, config *model.Config) error {
 		return fmt.Errorf("bind s3.bucket: %w", err)
 	}
 
+	// Chrome
+	if err = bindStringVar(cmd, &config.Chrome.Host, "chrome.host", "localhost", "Chrome Host"); err != nil {
+		return fmt.Errorf("bind chrome.host: %w", err)
+	}
+	if err = bindStringVar(cmd, &config.Chrome.Port, "chrome.port", "3000", "Chrome Port"); err != nil {
+		return fmt.Errorf("bind chrome.port: %w", err)
+	}
+	if err = bindIntVar(cmd, &config.Chrome.Timeout, "chrome.timeout", 30, "Chrome Connection Timeout"); err != nil {
+		return fmt.Errorf("bind chrome.timeout: %w", err)
+	}
+
 	// NATS
 	if err = bindStringVar(cmd, &config.Nats.Host, "nats.host", "localhost", "NATS Host"); err != nil {
 		return fmt.Errorf("bind nats.host: %w", err)

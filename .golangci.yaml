@@ -72,6 +72,8 @@ linters:
           disabled: true
         - name: package-directory-mismatch
           disabled: true
+        - name: unsecure-url-scheme
+          disabled: true
         - name: unhandled-error
           arguments:
             - "fmt\\..*"

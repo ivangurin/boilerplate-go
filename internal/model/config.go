@@ -3,12 +3,13 @@ package model
 import "fmt"
 
 type Config struct {
-	LogLevel string     `yaml:"log_level" json:"log_level" mapstructure:"log-level" validate:"required"`
-	DB       ConfigDB   `yaml:"db" json:"db" mapstructure:"db"`
-	API      ConfigAPI  `yaml:"api" json:"api" mapstructure:"api"`
-	S3       ConfigS3   `yaml:"s3" json:"s3" mapstructure:"s3" validate:"required"`
-	Nats     ConfigNats `yaml:"nats" json:"nats" mapstructure:"nats" validate:"required"`
-	Mail     ConfigMail `yaml:"mail" json:"mail" mapstructure:"mail" validate:"required"`
+	LogLevel string       `yaml:"log_level" json:"log_level" mapstructure:"log-level" validate:"required"`
+	DB       ConfigDB     `yaml:"db" json:"db" mapstructure:"db"`
+	API      ConfigAPI    `yaml:"api" json:"api" mapstructure:"api"`
+	S3       ConfigS3     `yaml:"s3" json:"s3" mapstructure:"s3" validate:"required"`
+	Chrome   ConfigChrome `yaml:"chrome" json:"chrome" mapstructure:"chrome" validate:"required"`
+	Nats     ConfigNats   `yaml:"nats" json:"nats" mapstructure:"nats" validate:"required"`
+	Mail     ConfigMail   `yaml:"mail" json:"mail" mapstructure:"mail" validate:"required"`
 }
 
 type ConfigDB struct {
@@ -35,6 +36,12 @@ type ConfigS3 struct {
 	AccessKey string `yaml:"access-key" json:"access-key" mapstructure:"access-key" validate:"required"`
 	SecretKey string `yaml:"secret-key" json:"secret-key" mapstructure:"secret-key" validate:"required"`
 	Bucket    string `yaml:"bucket" json:"bucket" mapstructure:"bucket" validate:"required"`
+}
+
+type ConfigChrome struct {
+	Host    string `yaml:"host" json:"host" mapstructure:"host" validate:"required"`
+	Port    string `yaml:"port" json:"port" mapstructure:"port" validate:"required"`
+	Timeout int    `yaml:"timeout" json:"timeout" mapstructure:"timeout" validate:"required"`
 }
 
 type ConfigNats struct {

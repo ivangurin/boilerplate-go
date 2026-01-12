@@ -5,7 +5,7 @@
 ## Структура проекта
 
 ```text
-green-aid-backend/
+boilerplate-backend/
 ├── cmd/
 │   └── boilerplate/                      # Точка входа в приложение
 ├── internal/
