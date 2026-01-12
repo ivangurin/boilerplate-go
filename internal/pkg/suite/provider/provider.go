@@ -54,7 +54,7 @@ func (sp *Provider) Context() context.Context {
 	return sp.ctx
 }
 
-func (sp *Provider) ContextWithValue(key any, val any) context.Context {
+func (sp *Provider) ContextWithValue(key, val any) context.Context {
 	return context.WithValue(sp.Context(), key, val)
 }
 

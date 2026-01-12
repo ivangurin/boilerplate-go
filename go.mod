@@ -8,6 +8,7 @@ tool (
 	github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 	github.com/swaggo/swag/cmd/swag
 	github.com/vektra/mockery/v2
+	mvdan.cc/gofumpt
 )
 
 require (

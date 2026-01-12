@@ -1,10 +1,11 @@
 package jwt
 
 import (
-	"boilerplate/internal/model"
 	"errors"
 	"fmt"
 	"time"
+
+	"boilerplate/internal/model"
 
 	"github.com/golang-jwt/jwt/v5"
 )

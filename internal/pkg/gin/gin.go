@@ -1,10 +1,11 @@
 package gin
 
 import (
+	"net/http"
+
 	"boilerplate/internal/model"
 	"boilerplate/internal/pkg/errors"
 	"boilerplate/internal/pkg/metadata"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )

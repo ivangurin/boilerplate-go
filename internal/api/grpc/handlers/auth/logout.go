@@ -1,9 +1,10 @@
 package auth
 
 import (
-	"boilerplate/internal/pkg/grpc"
 	"context"
 	"fmt"
+
+	"boilerplate/internal/pkg/grpc"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 )

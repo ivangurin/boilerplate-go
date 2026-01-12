@@ -1,9 +1,10 @@
 package users
 
 import (
+	"time"
+
 	"boilerplate/internal/model"
 	"boilerplate/internal/repository"
-	"time"
 )
 
 type User struct {

@@ -105,8 +105,13 @@ lint-proto:
 	@echo "\033[32m▶\033[0m Linting proto files..."
 	@go tool buf lint
 
+.PHONY: format
+format:
+	@echo "\033[32m▶\033[0m Code formatting..."
+	@go tool gofumpt -l -w -extra .
+
 .PHONY: generate
-generate: gen-mock gen-swag gen-proto
+generate: format gen-mock gen-swag gen-proto
 	@echo "\033[32m▶\033[0m Code generation completed successfully"
 
 .PHONY: docker-build

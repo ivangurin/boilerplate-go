@@ -1,9 +1,10 @@
 package users
 
 import (
-	"boilerplate/internal/repository"
 	"context"
 	"fmt"
+
+	"boilerplate/internal/repository"
 )
 
 func (s *service) Search(ctx context.Context, req *UserSearchRequest) (*UserSearchResponse, error) {

@@ -1,10 +1,11 @@
 package db
 
 import (
-	"boilerplate/internal/pkg/logger"
 	"context"
 	"fmt"
 	"time"
+
+	"boilerplate/internal/pkg/logger"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
