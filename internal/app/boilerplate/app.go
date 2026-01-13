@@ -96,7 +96,7 @@ func (a *App) Run() error {
 	chromeClient := chrome.NewClient(a.config.Chrome.Host, a.config.Chrome.Port, a.config.Chrome.Timeout)
 
 	// Broker Server
-	brokerServer, brokerConn, err := nats_server.NewServer(&a.config.Nats, nats_server.WithName("boilerplate-nats-server"), nats_server.WithJetStream(a.config.Nats.Domain), nats_server.WithDebug(debug))
+	brokerServer, err := nats_server.NewServer(&a.config.Nats, nats_server.WithName("boilerplate-nats-server"), nats_server.WithJetStream(a.config.Nats.Domain), nats_server.WithDebug(debug))
 	if err != nil {
 		closer.CloseAll()
 		return fmt.Errorf("create nats server: %w", err)
@@ -119,6 +119,12 @@ func (a *App) Run() error {
 	})
 
 	// Broker client
+	brokerConn, err := brokerServer.GetConn()
+	if err != nil {
+		closer.CloseAll()
+		return fmt.Errorf("get nats server conn: %w", err)
+	}
+
 	logger.Info(ctx, "nats server conn obtained")
 	brokerClient, err := nats_client.NewClient(logger, nats_client.WithName("boilerplate-nats-client"), nats_client.WithConn(brokerConn))
 	if err != nil {

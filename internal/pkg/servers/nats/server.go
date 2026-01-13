@@ -20,7 +20,7 @@ type server struct {
 	debug           bool
 }
 
-func NewServer(config *model.ConfigNats, opts ...Option) (model.BrokerServer, net.Conn, error) {
+func NewServer(config *model.ConfigNats, opts ...Option) (model.BrokerServer, error) {
 	s := &server{
 		name: "nats-server",
 	}
@@ -30,12 +30,12 @@ func NewServer(config *model.ConfigNats, opts ...Option) (model.BrokerServer, ne
 
 	port, err := strconv.Atoi(config.Port)
 	if err != nil {
-		return nil, nil, fmt.Errorf("nats parse conf port: %w", err)
+		return nil, fmt.Errorf("nats parse conf port: %w", err)
 	}
 
 	httpPort, err := strconv.Atoi(config.HTTPPort)
 	if err != nil {
-		return nil, nil, fmt.Errorf("nats parse conf http port: %w", err)
+		return nil, fmt.Errorf("nats parse conf http port: %w", err)
 	}
 
 	serverOpts := &nats_server.Options{
@@ -54,17 +54,12 @@ func NewServer(config *model.ConfigNats, opts ...Option) (model.BrokerServer, ne
 
 	s.server, err = nats_server.NewServer(serverOpts)
 	if err != nil {
-		return nil, nil, err
-	}
-
-	conn, err := s.server.InProcessConn()
-	if err != nil {
-		return nil, nil, fmt.Errorf("get server connection: %w", err)
+		return nil, err
 	}
 
 	s.server.ConfigureLogger()
 
-	return s, conn, nil
+	return s, nil
 }
 
 func (s *server) Start() error {
@@ -82,4 +77,8 @@ func (s *server) Stop() error {
 	}
 	s.server.Shutdown()
 	return nil
+}
+
+func (s *server) GetConn() (net.Conn, error) {
+	return s.server.InProcessConn()
 }

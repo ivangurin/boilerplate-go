@@ -2,11 +2,13 @@ package model
 
 import (
 	"context"
+	"net"
 )
 
 type BrokerServer interface {
 	Start() error
 	Stop() error
+	GetConn() (net.Conn, error)
 }
 
 type BrokerClient interface {
