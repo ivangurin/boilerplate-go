@@ -11,6 +11,7 @@ import (
 	grpc_handlers "boilerplate/internal/api/grpc/handlers"
 	grpc_middleware "boilerplate/internal/api/grpc/middleware"
 	http_handlers "boilerplate/internal/api/http/handlers"
+	consumers_pkg "boilerplate/internal/consumers"
 	"boilerplate/internal/model"
 	"boilerplate/internal/pkg/clients/chrome"
 	"boilerplate/internal/pkg/clients/db"
@@ -24,6 +25,7 @@ import (
 	nats_server "boilerplate/internal/pkg/servers/nats"
 	"boilerplate/internal/repository"
 	"boilerplate/internal/service_provider"
+	"boilerplate/internal/topics"
 	"boilerplate/migrations"
 )
 
@@ -145,6 +147,23 @@ func (a *App) Run() error {
 
 	// Service Provider
 	sp := service_provider.NewProvider(a.config, logger, repo, s3Client, chromeClient, brokerClient)
+
+	// Create or update topics
+	err = topics.CreateOrUpdateTopics(ctx, brokerClient)
+	if err != nil {
+		closer.CloseAll()
+		return fmt.Errorf("create or update topics: %w", err)
+	}
+
+	// Start Consumers
+	consumers := consumers_pkg.NewConsumers(logger, brokerClient, sp)
+
+	err = consumers.Start(ctx)
+	if err != nil {
+		closer.CloseAll()
+		return fmt.Errorf("start consumers: %w", err)
+	}
+	logger.Info(ctx, "consumers started")
 
 	// HTTP Server
 	if 1 == 2 {

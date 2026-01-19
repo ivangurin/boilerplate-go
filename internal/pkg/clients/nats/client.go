@@ -7,17 +7,17 @@ import (
 	"net"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 
 	"boilerplate/internal/model"
-	"boilerplate/internal/pkg/logger"
+	logger_pkg "boilerplate/internal/pkg/logger"
 	"boilerplate/internal/pkg/metadata"
 )
 
 const (
+	headerKey       = "X-Key"
 	headerRequestID = "X-Request-ID"
 	headerOrgID     = "X-Org-ID"
 	headerUserID    = "X-User-ID"
@@ -25,21 +25,18 @@ const (
 )
 
 type client struct {
-	logger       logger.Logger
-	name         string
-	url          string
-	conn         net.Conn
-	nc           *nats.Conn
-	js           jetstream.JetStream
-	streams      map[string]jetstream.Stream
-	streamsMutex sync.RWMutex
-	contexts     []jetstream.ConsumeContext
+	logger   logger_pkg.Logger
+	name     string
+	url      string
+	conn     net.Conn
+	nc       *nats.Conn
+	js       jetstream.JetStream
+	contexts []jetstream.ConsumeContext
 }
 
-func NewClient(logger logger.Logger, opts ...Option) (model.BrokerClient, error) {
+func NewClient(logger logger_pkg.Logger, opts ...Option) (model.BrokerClient, error) {
 	c := &client{
-		logger:  logger,
-		streams: map[string]jetstream.Stream{},
+		logger: logger,
 	}
 
 	for _, opt := range opts {
@@ -67,22 +64,23 @@ func NewClient(logger logger.Logger, opts ...Option) (model.BrokerClient, error)
 	return c, nil
 }
 
-func (c *client) Publish(ctx context.Context, subject string, key, data any) error {
-	c.logger.DebugKV(ctx, "publish to subject", "subject", subject, "key", key)
-	if _, err := c.createOrUpdateStream(ctx, subject); err != nil {
-		return fmt.Errorf("create or update stream for subject %s: %w", subject, err)
-	}
+func (c *client) Publish(ctx context.Context, topic string, partition *int, key, data any) error {
+	c.logger.DebugKV(ctx, "publish to topic", "topic", topic, "partition", partition, "key", key)
 
-	fullSubject := fmt.Sprintf("%s.%v", subject, key)
+	if partition != nil {
+		topic = fmt.Sprintf("%s.p%d", topic, *partition)
+	}
 
 	dataBytes, err := json.Marshal(data)
 	if err != nil {
-		return fmt.Errorf("marshal data for subject %s: %w", subject, err)
+		return fmt.Errorf("marshal data for subject %s: %w", topic, err)
 	}
 
 	// Создаем сообщение с заголовками из контекста
-	msg := nats.NewMsg(fullSubject)
+	msg := nats.NewMsg(topic)
 	msg.Data = dataBytes
+
+	msg.Header.Add(headerKey, fmt.Sprintf("%v", key))
 
 	// Извлекаем метаданные из контекста и добавляем в заголовки
 	if requestID, ok := metadata.GetRequestID(ctx); ok {
@@ -97,35 +95,53 @@ func (c *client) Publish(ctx context.Context, subject string, key, data any) err
 
 	pa, err := c.js.PublishMsg(ctx, msg)
 	if err != nil {
-		return fmt.Errorf("publish to subject %s: %w", fullSubject, err)
+		return fmt.Errorf("publish to topic %s: %w", topic, err)
 	}
 
-	c.logger.DebugKV(ctx, "published to subject", "subject", fullSubject, "sequence", pa.Sequence)
+	c.logger.DebugKV(ctx, "published to topic", "topic", topic, "sequence", pa.Sequence)
 
 	return nil
 }
 
-func (c *client) Subscribe(ctx context.Context, consumerName string, subjects []string, handler model.BrokerHandler) error {
-	for _, subject := range subjects {
-		c.logger.InfoKV(ctx, "subscribing to subject", "subject", subject, "consumer", consumerName)
+// nolint: gocognit
+func (c *client) Subscribe(ctx context.Context, consumerName, description string, topic model.BrokerTopic, handler model.BrokerHandler) error {
+	c.logger.InfoKV(ctx, "subscribing to topic", "consumer", consumerName, "topic", topic.Name)
 
-		stream, err := c.createOrUpdateStream(ctx, subject)
-		if err != nil {
-			return fmt.Errorf("create or update stream for subject %s: %w", subject, err)
-		}
+	stream, err := c.js.Stream(ctx, topic.Name)
+	if err != nil {
+		return fmt.Errorf("get stream for topic %s: %w", topic.Name, err)
+	}
 
+	info, err := stream.Info(ctx)
+	if err != nil {
+		return fmt.Errorf("get stream info %s: %w", topic.Name, err)
+	}
+
+	for _, subject := range info.Config.Subjects {
+		cn := consumerName + "-" + subject
+		cn = strings.ReplaceAll(cn, ".", "-")
 		natsConsumer, err := stream.CreateOrUpdateConsumer(ctx, jetstream.ConsumerConfig{
-			Name:          consumerName,
-			Durable:       consumerName,
-			Description:   consumerName,
-			FilterSubject: subject + ".>",
+			Name:          cn,
+			Durable:       cn,
+			Description:   description,
+			FilterSubject: subject,
 			AckPolicy:     jetstream.AckExplicitPolicy,
+			MaxDeliver:    topic.Retries + 1,
+			DeliverPolicy: jetstream.DeliverAllPolicy,
 		})
 		if err != nil {
 			return fmt.Errorf("create or update consumer for subject %s: %w", subject, err)
 		}
 
 		natsContext, err := natsConsumer.Consume(func(msg jetstream.Msg) {
+			md, err := msg.Metadata()
+			if err != nil {
+				c.logger.ErrorKV(ctx, "get message metadata error", "consumer", consumerName, "subject", msg.Subject(), "error", err.Error())
+				return
+			}
+
+			key := msg.Headers().Get(headerKey)
+
 			requestID := msg.Headers().Get(headerRequestID)
 			if requestID != "" {
 				ctx = metadata.WithRequestID(ctx, requestID)
@@ -146,27 +162,58 @@ func (c *client) Subscribe(ctx context.Context, consumerName string, subjects []
 				ctx = metadata.WithIP(ctx, ip)
 			}
 
-			c.logger.DebugKV(ctx, "message received", "consumer", consumerName, "subject", msg.Subject())
+			c.logger.DebugKV(ctx, "message received", "consumer", cn, "subject", msg.Subject())
 
-			err := handler(ctx, msg.Subject(), msg.Data())
+			err = handler(ctx, msg.Subject(), msg.Data())
 			if err != nil {
-				c.logger.ErrorKV(ctx, "handle message error", "consumer", consumerName, "subject", msg.Subject(), "error", err.Error())
-				if err := msg.TermWithReason(err.Error()); err != nil {
-					c.logger.ErrorKV(ctx, "term message error", "consumer", consumerName, "subject", msg.Subject(), "error", err.Error())
+				c.logger.ErrorKV(ctx, "handle message error", "consumer", cn, "subject", msg.Subject(), "error", err.Error())
+				if md.NumDelivered >= uint64(topic.Retries) {
+					c.logger.WarnKV(ctx, "message reached max delivery attempts", "consumer", cn, "subject", msg.Subject(), "attempts", md.NumDelivered)
+
+					// Публикуем в DLQ перед Ack
+					err = c.Publish(ctx, topic.DLQTopicName, nil, key, msg.Data())
+					if err != nil {
+						c.logger.ErrorKV(ctx, "publish to DLQ error", "consumer", cn, "subject", msg.Subject(), "error", err.Error())
+						return
+					}
+					c.logger.InfoKV(ctx, "message sent to DLQ", "consumer", cn, "subject", msg.Subject(), "dlq_topic", topic.DLQTopicName)
+
+					if err = msg.Ack(); err != nil {
+						c.logger.ErrorKV(ctx, "ack message error", "consumer", cn, "subject", msg.Subject(), "error", err.Error())
+						return
+					}
+
+					return
 				}
+
+				if topic.Retries > 0 && md.NumDelivered < uint64(topic.Retries) {
+					if err := msg.NakWithDelay(topic.RetriesDelay); err != nil {
+						c.logger.ErrorKV(ctx, "nak with delay message", "consumer", cn, "subject", msg.Subject(), "error", err.Error())
+						return
+					}
+					c.logger.DebugKV(ctx, "nak message with delay", "consumer", cn, "subject", msg.Subject(), "attempts", md.NumDelivered)
+					return
+				}
+
+				if err := msg.TermWithReason(err.Error()); err != nil {
+					c.logger.ErrorKV(ctx, "term message error", "consumer", cn, "subject", msg.Subject(), "error", err.Error())
+				}
+
 				return
 			}
 
 			if err = msg.Ack(); err != nil {
-				c.logger.ErrorKV(ctx, "ack message error", "consumer", consumerName, "subject", msg.Subject(), "error", err.Error())
+				c.logger.ErrorKV(ctx, "ack message error", "consumer", cn, "subject", msg.Subject(), "error", err.Error())
 				return
 			}
 
-			c.logger.DebugKV(ctx, "message processed successfully", "consumer", consumerName, "subject", msg.Subject())
+			c.logger.DebugKV(ctx, "message processed successfully", "consumer", cn, "subject", msg.Subject())
 		})
 		if err != nil {
 			return fmt.Errorf("start to consume messages for subject %s: %w", subject, err)
 		}
+
+		c.logger.DebugKV(ctx, "subscribed to subject", "consumer", cn, "subject", subject)
 
 		c.contexts = append(c.contexts, natsContext)
 	}
@@ -187,66 +234,45 @@ func (c *client) Close() error {
 	return nil
 }
 
-func (c *client) createOrUpdateStream(ctx context.Context, subject string) (jetstream.Stream, error) {
-	streamName := strings.ReplaceAll(subject, ".", "_")
-
-	c.streamsMutex.RLock()
-	if stream, exists := c.streams[streamName]; exists {
-		c.streamsMutex.RUnlock()
-		return stream, nil
-	}
-	c.streamsMutex.RUnlock()
-
-	c.streamsMutex.Lock()
-	defer c.streamsMutex.Unlock()
-
-	if stream, exists := c.streams[streamName]; exists {
-		return stream, nil
+func (c *client) CreateOrUpdateTopic(ctx context.Context, topic model.BrokerTopic) error {
+	subjects := []string{}
+	if topic.Partitions > 0 {
+		for i := 0; i < topic.Partitions; i++ {
+			subjects = append(subjects, fmt.Sprintf("%s.p%d", topic.Name, i))
+		}
+	} else {
+		subjects = append(subjects, topic.Name)
 	}
 
-	// Try to get existing stream
-	stream, err := c.js.Stream(ctx, streamName)
+	stream, err := c.js.Stream(ctx, topic.Name)
 	if err == nil {
-		// Stream exists, check subjects
 		info, err := stream.Info(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("get stream info %s: %w", streamName, err)
+			return fmt.Errorf("get stream info %s: %w", topic.Name, err)
 		}
 
-		subjectPattern := subject + ".>"
-		subjectExists := false
-		for _, s := range info.Config.Subjects {
-			if s == subjectPattern {
-				subjectExists = true
-				break
-			}
+		info.Config.Subjects = subjects
+		info.Config.MaxBytes = topic.MaxBytes
+		info.Config.MaxAge = topic.MaxAge
+
+		_, err = c.js.UpdateStream(ctx, info.Config)
+		if err != nil {
+			return fmt.Errorf("update stream %s with new subject: %w", topic.Name, err)
 		}
 
-		if !subjectExists {
-			// Add new subject to existing ones
-			info.Config.Subjects = append(info.Config.Subjects, subjectPattern)
-			stream, err = c.js.UpdateStream(ctx, info.Config)
-			if err != nil {
-				return nil, fmt.Errorf("update stream %s with new subject: %w", streamName, err)
-			}
-		}
-
-		c.streams[streamName] = stream
-		return stream, nil
+		return nil
 	}
 
-	// Stream doesn't exist, create new one
-	stream, err = c.js.CreateStream(ctx, jetstream.StreamConfig{
-		Name:        streamName,
-		Description: fmt.Sprintf("Stream for %s", streamName),
-		Subjects:    []string{subject + ".>"},
-		MaxBytes:    -1,
+	_, err = c.js.CreateStream(ctx, jetstream.StreamConfig{
+		Name:        topic.Name,
+		Description: topic.Description,
+		Subjects:    subjects,
+		MaxBytes:    topic.MaxBytes,
+		MaxAge:      topic.MaxAge,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("create stream %s: %w", streamName, err)
+		return fmt.Errorf("create stream %s: %w", topic.Name, err)
 	}
 
-	c.streams[streamName] = stream
-
-	return stream, nil
+	return nil
 }

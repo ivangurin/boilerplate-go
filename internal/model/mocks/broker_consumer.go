@@ -21,6 +21,51 @@ func (_m *BrokerConsumer) EXPECT() *BrokerConsumer_Expecter {
 	return &BrokerConsumer_Expecter{mock: &_m.Mock}
 }
 
+// DLQTopic provides a mock function with no fields
+func (_m *BrokerConsumer) DLQTopic() string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for DLQTopic")
+	}
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// BrokerConsumer_DLQTopic_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DLQTopic'
+type BrokerConsumer_DLQTopic_Call struct {
+	*mock.Call
+}
+
+// DLQTopic is a helper method to define mock.On call
+func (_e *BrokerConsumer_Expecter) DLQTopic() *BrokerConsumer_DLQTopic_Call {
+	return &BrokerConsumer_DLQTopic_Call{Call: _e.mock.On("DLQTopic")}
+}
+
+func (_c *BrokerConsumer_DLQTopic_Call) Run(run func()) *BrokerConsumer_DLQTopic_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *BrokerConsumer_DLQTopic_Call) Return(_a0 string) *BrokerConsumer_DLQTopic_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *BrokerConsumer_DLQTopic_Call) RunAndReturn(run func() string) *BrokerConsumer_DLQTopic_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Description provides a mock function with no fields
 func (_m *BrokerConsumer) Description() string {
 	ret := _m.Called()
@@ -114,6 +159,51 @@ func (_c *BrokerConsumer_HandleMessage_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
+// MainTopic provides a mock function with no fields
+func (_m *BrokerConsumer) MainTopic() string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for MainTopic")
+	}
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// BrokerConsumer_MainTopic_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MainTopic'
+type BrokerConsumer_MainTopic_Call struct {
+	*mock.Call
+}
+
+// MainTopic is a helper method to define mock.On call
+func (_e *BrokerConsumer_Expecter) MainTopic() *BrokerConsumer_MainTopic_Call {
+	return &BrokerConsumer_MainTopic_Call{Call: _e.mock.On("MainTopic")}
+}
+
+func (_c *BrokerConsumer_MainTopic_Call) Run(run func()) *BrokerConsumer_MainTopic_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *BrokerConsumer_MainTopic_Call) Return(_a0 string) *BrokerConsumer_MainTopic_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *BrokerConsumer_MainTopic_Call) RunAndReturn(run func() string) *BrokerConsumer_MainTopic_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Name provides a mock function with no fields
 func (_m *BrokerConsumer) Name() string {
 	ret := _m.Called()
@@ -155,53 +245,6 @@ func (_c *BrokerConsumer_Name_Call) Return(_a0 string) *BrokerConsumer_Name_Call
 }
 
 func (_c *BrokerConsumer_Name_Call) RunAndReturn(run func() string) *BrokerConsumer_Name_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Subjects provides a mock function with no fields
-func (_m *BrokerConsumer) Subjects() []string {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for Subjects")
-	}
-
-	var r0 []string
-	if rf, ok := ret.Get(0).(func() []string); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]string)
-		}
-	}
-
-	return r0
-}
-
-// BrokerConsumer_Subjects_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Subjects'
-type BrokerConsumer_Subjects_Call struct {
-	*mock.Call
-}
-
-// Subjects is a helper method to define mock.On call
-func (_e *BrokerConsumer_Expecter) Subjects() *BrokerConsumer_Subjects_Call {
-	return &BrokerConsumer_Subjects_Call{Call: _e.mock.On("Subjects")}
-}
-
-func (_c *BrokerConsumer_Subjects_Call) Run(run func()) *BrokerConsumer_Subjects_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *BrokerConsumer_Subjects_Call) Return(_a0 []string) *BrokerConsumer_Subjects_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *BrokerConsumer_Subjects_Call) RunAndReturn(run func() []string) *BrokerConsumer_Subjects_Call {
 	_c.Call.Return(run)
 	return _c
 }

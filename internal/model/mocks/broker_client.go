@@ -67,17 +67,64 @@ func (_c *BrokerClient_Close_Call) RunAndReturn(run func() error) *BrokerClient_
 	return _c
 }
 
-// Publish provides a mock function with given fields: ctx, subject, key, data
-func (_m *BrokerClient) Publish(ctx context.Context, subject string, key any, data any) error {
-	ret := _m.Called(ctx, subject, key, data)
+// CreateOrUpdateTopic provides a mock function with given fields: ctx, topic
+func (_m *BrokerClient) CreateOrUpdateTopic(ctx context.Context, topic model.BrokerTopic) error {
+	ret := _m.Called(ctx, topic)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateOrUpdateTopic")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.BrokerTopic) error); ok {
+		r0 = rf(ctx, topic)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// BrokerClient_CreateOrUpdateTopic_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateOrUpdateTopic'
+type BrokerClient_CreateOrUpdateTopic_Call struct {
+	*mock.Call
+}
+
+// CreateOrUpdateTopic is a helper method to define mock.On call
+//   - ctx context.Context
+//   - topic model.BrokerTopic
+func (_e *BrokerClient_Expecter) CreateOrUpdateTopic(ctx interface{}, topic interface{}) *BrokerClient_CreateOrUpdateTopic_Call {
+	return &BrokerClient_CreateOrUpdateTopic_Call{Call: _e.mock.On("CreateOrUpdateTopic", ctx, topic)}
+}
+
+func (_c *BrokerClient_CreateOrUpdateTopic_Call) Run(run func(ctx context.Context, topic model.BrokerTopic)) *BrokerClient_CreateOrUpdateTopic_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.BrokerTopic))
+	})
+	return _c
+}
+
+func (_c *BrokerClient_CreateOrUpdateTopic_Call) Return(_a0 error) *BrokerClient_CreateOrUpdateTopic_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *BrokerClient_CreateOrUpdateTopic_Call) RunAndReturn(run func(context.Context, model.BrokerTopic) error) *BrokerClient_CreateOrUpdateTopic_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Publish provides a mock function with given fields: ctx, topic, partition, key, data
+func (_m *BrokerClient) Publish(ctx context.Context, topic string, partition *int, key any, data any) error {
+	ret := _m.Called(ctx, topic, partition, key, data)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Publish")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, any, any) error); ok {
-		r0 = rf(ctx, subject, key, data)
+	if rf, ok := ret.Get(0).(func(context.Context, string, *int, any, any) error); ok {
+		r0 = rf(ctx, topic, partition, key, data)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -92,16 +139,17 @@ type BrokerClient_Publish_Call struct {
 
 // Publish is a helper method to define mock.On call
 //   - ctx context.Context
-//   - subject string
+//   - topic string
+//   - partition *int
 //   - key any
 //   - data any
-func (_e *BrokerClient_Expecter) Publish(ctx interface{}, subject interface{}, key interface{}, data interface{}) *BrokerClient_Publish_Call {
-	return &BrokerClient_Publish_Call{Call: _e.mock.On("Publish", ctx, subject, key, data)}
+func (_e *BrokerClient_Expecter) Publish(ctx interface{}, topic interface{}, partition interface{}, key interface{}, data interface{}) *BrokerClient_Publish_Call {
+	return &BrokerClient_Publish_Call{Call: _e.mock.On("Publish", ctx, topic, partition, key, data)}
 }
 
-func (_c *BrokerClient_Publish_Call) Run(run func(ctx context.Context, subject string, key any, data any)) *BrokerClient_Publish_Call {
+func (_c *BrokerClient_Publish_Call) Run(run func(ctx context.Context, topic string, partition *int, key any, data any)) *BrokerClient_Publish_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(any), args[3].(any))
+		run(args[0].(context.Context), args[1].(string), args[2].(*int), args[3].(any), args[4].(any))
 	})
 	return _c
 }
@@ -111,22 +159,22 @@ func (_c *BrokerClient_Publish_Call) Return(_a0 error) *BrokerClient_Publish_Cal
 	return _c
 }
 
-func (_c *BrokerClient_Publish_Call) RunAndReturn(run func(context.Context, string, any, any) error) *BrokerClient_Publish_Call {
+func (_c *BrokerClient_Publish_Call) RunAndReturn(run func(context.Context, string, *int, any, any) error) *BrokerClient_Publish_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Subscribe provides a mock function with given fields: ctx, consumerName, subjects, handler
-func (_m *BrokerClient) Subscribe(ctx context.Context, consumerName string, subjects []string, handler model.BrokerHandler) error {
-	ret := _m.Called(ctx, consumerName, subjects, handler)
+// Subscribe provides a mock function with given fields: ctx, consumerName, description, topic, handler
+func (_m *BrokerClient) Subscribe(ctx context.Context, consumerName string, description string, topic model.BrokerTopic, handler model.BrokerHandler) error {
+	ret := _m.Called(ctx, consumerName, description, topic, handler)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Subscribe")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, []string, model.BrokerHandler) error); ok {
-		r0 = rf(ctx, consumerName, subjects, handler)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, model.BrokerTopic, model.BrokerHandler) error); ok {
+		r0 = rf(ctx, consumerName, description, topic, handler)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -142,15 +190,16 @@ type BrokerClient_Subscribe_Call struct {
 // Subscribe is a helper method to define mock.On call
 //   - ctx context.Context
 //   - consumerName string
-//   - subjects []string
+//   - description string
+//   - topic model.BrokerTopic
 //   - handler model.BrokerHandler
-func (_e *BrokerClient_Expecter) Subscribe(ctx interface{}, consumerName interface{}, subjects interface{}, handler interface{}) *BrokerClient_Subscribe_Call {
-	return &BrokerClient_Subscribe_Call{Call: _e.mock.On("Subscribe", ctx, consumerName, subjects, handler)}
+func (_e *BrokerClient_Expecter) Subscribe(ctx interface{}, consumerName interface{}, description interface{}, topic interface{}, handler interface{}) *BrokerClient_Subscribe_Call {
+	return &BrokerClient_Subscribe_Call{Call: _e.mock.On("Subscribe", ctx, consumerName, description, topic, handler)}
 }
 
-func (_c *BrokerClient_Subscribe_Call) Run(run func(ctx context.Context, consumerName string, subjects []string, handler model.BrokerHandler)) *BrokerClient_Subscribe_Call {
+func (_c *BrokerClient_Subscribe_Call) Run(run func(ctx context.Context, consumerName string, description string, topic model.BrokerTopic, handler model.BrokerHandler)) *BrokerClient_Subscribe_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].([]string), args[3].(model.BrokerHandler))
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(model.BrokerTopic), args[4].(model.BrokerHandler))
 	})
 	return _c
 }
@@ -160,7 +209,7 @@ func (_c *BrokerClient_Subscribe_Call) Return(_a0 error) *BrokerClient_Subscribe
 	return _c
 }
 
-func (_c *BrokerClient_Subscribe_Call) RunAndReturn(run func(context.Context, string, []string, model.BrokerHandler) error) *BrokerClient_Subscribe_Call {
+func (_c *BrokerClient_Subscribe_Call) RunAndReturn(run func(context.Context, string, string, model.BrokerTopic, model.BrokerHandler) error) *BrokerClient_Subscribe_Call {
 	_c.Call.Return(run)
 	return _c
 }
